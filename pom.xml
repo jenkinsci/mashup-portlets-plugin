@@ -13,10 +13,18 @@
 	<packaging>hpi</packaging>
 
 	<scm>
-		<connection>scm:svn:http://todo</connection>
-		<developerConnection>scm:svn:http://todo</developerConnection>
-		<url>http://todo</url>
+		<connection>scm:git:ssh://github.com/ghenzler/jenkins-mashup-portlets.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/ghenzler/jenkins-mashup-portlets.git</developerConnection>
+		<url>https://github.com/ghenzler/jenkins-mashup-portlets</url>
 	</scm>
+
+	<developers>
+		<developer>
+			<id>ghenzler</id>
+			<name>G.Henzler</name>
+			<email>jenkins@ghenzler.de</email>
+		</developer>
+	</developers>
 
 	<dependencies>
 		<dependency>
@@ -33,40 +41,6 @@
 	</dependencies>
 
 	<build>
-
-
-		<plugins>
-
-			<!--  TODO -->
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-<!-- 				<version>2.3.2</version> -->
-				<dependencies>
-					<dependency>
-						<groupId>com.google.code.maven-scm-provider-svnjava</groupId>
-						<artifactId>maven-scm-provider-svnjava</artifactId>
-						<version>1.9</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<checkModificationExcludes>
-						<checkModificationExclude>/**/pom.xml.branch</checkModificationExclude>
-						<checkModificationExclude>/**/pom.xml.backup</checkModificationExclude>
-						<checkModificationExclude>/**/pom.xml.releaseBackup</checkModificationExclude>
-						<checkModificationExclude>/**/release.properties</checkModificationExclude>
-						<checkModificationExclude>/**/pom.xml.next</checkModificationExclude>
-						<checkModificationExclude>/**/pom.xml.tag</checkModificationExclude>
-					</checkModificationExcludes>
-					<suppressCommitBeforeTag>true</suppressCommitBeforeTag>
-					<remoteTagging>false</remoteTagging>
-					<providerImplementations>
-						<svn>javasvn</svn>
-					</providerImplementations>
-				</configuration>
-			</plugin>
-
-		</plugins>
-
 
 
 		<pluginManagement>
