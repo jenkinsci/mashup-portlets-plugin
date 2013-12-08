@@ -1,0 +1,6 @@
+<!--
+  This view is used to render the plugin list page.
+-->
+<div>
+  This plugin provides new dashboard portlets: Sonar Portlet, Recent Changes Portlet, Test Results Portlet and a Generic JS Portlet.
+</div>

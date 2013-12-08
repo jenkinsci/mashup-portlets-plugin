@@ -1,0 +1,21 @@
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+  <f:entry title="${%Name}" field="name">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="${%SonarBaseUrl}" field="sonarBaseUrl">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="${%MaxEntries}" field="maxEntries">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="${%LimitToProjects}" field="limitToProjects">
+     <f:textbox />
+  </f:entry>     
+  <f:entry title="${%LimitToStatus}" field="limitToStatus">
+     <f:textbox />
+  </f:entry>     
+  <f:entry title="${%DisplayMode}" field="displayMode">
+     <f:select />
+  </f:entry>       
+</j:jelly>
+

@@ -1,0 +1,22 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" 
+	    xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
+      xmlns:dp="/hudson/plugins/view/dashboard">
+
+<div id="${it.containerDivId}" align="left"><img src="${rootURL}/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif"/></div>
+<st:include page="console-ie-fallback-js.jelly"/>
+
+<st:bind var="mashupPlugin" value="${it}"/>
+
+<script type="text/javascript">
+
+new function(divId, rootUrl, ajaxViaJenkins) {
+/// GENERIC JS CONTENT STARTS HERE
+
+	${it.javascript}
+	
+/// GENERIC JS CONTENT ENDS HERE	
+}("${it.containerDivId}", "${rootURL}", mashupPlugin.ajaxViaJenkins);
+
+</script>
+
+</j:jelly>

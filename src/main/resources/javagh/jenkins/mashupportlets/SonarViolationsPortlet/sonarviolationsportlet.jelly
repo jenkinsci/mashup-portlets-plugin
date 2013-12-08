@@ -1,0 +1,193 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" 
+	    xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
+      xmlns:dp="/hudson/plugins/view/dashboard">
+
+<style>
+td.sTableTop { vertical-align: top; }
+.sMessage { white-space: normal; }
+</style>
+
+<div id="${it.divId}" align="left"></div>
+
+<st:include page="console-ie-fallback-js.jelly"/>
+<script type="text/javascript"><![CDATA[
+
+new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, prioValueByName) {
+
+	  var divSelect = "#" + divId;
+	  var loaderImgSrc = rootUrl+'/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif';
+	
+	  var violationsByProject = {};
+	  var responsesReceived = 0;  
+	
+	  function getPrioHtmlImg(prio) {
+	      var imgHtml = '<img src="'+sonarBase+'/images/priority/'+prioValueByName[prio]+'.png" border="0" alt="'+prio+'"/>';
+	      return imgHtml;        
+	  }
+	  
+	  window.handleJspViolationClick = function(resourceKey, violationLinkParams ) {
+	      ajaxViaJenkins(sonarBase + "/api/resources?resource="+resourceKey, function(resp) {
+	           var response = resp.responseObject();
+                   var resourceId = response[0].id;
+                   var violationLink = sonarBase + '/resource/index/' + resourceId  + violationLinkParams;  
+                   console.log('open link: ', violationLink );
+                   window.open(violationLink, "_blank");	                              
+	      });
+	      return false;
+	  };	  
+	
+	  function outputViolation(index, violation) {
+	  
+	     var message = violation.message;
+	     // remove long java package paths in message
+	     message = message.replace(/\b([a-z]+\.)+([A-Za-z0-9]+)/g, "$$2");
+	     
+	     var violationLinkParams = '?tab=violations&metric=info_violations&rule='+violation.priority; // key does not work anymore in 3.3.1 violation.rule.key; 
+	     var violationLink = sonarBase + '/resource/index/' + violation.resource.key + violationLinkParams;  
+	     var violationOnClick = "";  
+	     
+	     // workaround for https://jira.codehaus.org/browse/SONAR-3962
+	     if(violationLink.indexOf(".jsp")!==-1) {
+	     	     violationOnClick = "return window.handleJspViolationClick('" + violation.resource.key + "','"+violationLinkParams +"')";
+	     	     violationLink = "#";
+	     }	     
+	  
+	     Q(divSelect+' table:last').append('<tr '+(violation.isNew?'bgcolor="#FFFF66"':'')+'><td>'+getPrioHtmlImg([violation.priority])
+	              +'</td><td class="sMessage" style="white-space:normal"><a href="'+violationLink+'" onclick="'+violationOnClick +'" target="_blank">'+message+ 
+	              "</a><br/>in " + violation.resource.name 
+	              +'</td><td class="sTableTop">' + violation.resource.language
+	              +'</td><td class="sTableTop">' + violation.createdAt.substring(0, 19).replace('T',' ') + '</td></tr>'
+	              );	  
+
+	     if(index == maxEntries-1) {
+	     	return false;
+	     }
+	  }
+	  
+	  function outputViolationsTable(violations) {
+	      Q(divSelect).append('<table class="pane bigtable"><th align="left">Prio.</th><th align="left" width="850">Message</th><th align="left">Lang.</th><th align="left">Created</th></table>');
+	      Q.each(violations, outputViolation);
+	      if(violations.length>maxEntries) {
+	      	Q(divSelect).append( ('' + violations.length-maxEntries) + ' more validations in <a href="'+sonarBase+'" target="sonar">Sonar</a>');
+	      }
+	  }  
+	
+	  function violationsComparator(vioA, vioB) {
+	      var prioA = prioValueByName[vioA.priority]; 
+	      var prioB = prioValueByName[vioB.priority];
+	      if(prioA == prioB) {
+	      	return vioB.createdDate.getTime() - vioA.createdDate.getTime();
+	      } 
+	      return prioB - prioA;        
+	  }
+	
+	  function countPrio(allViolations, prioName) {
+	      var count = 0;
+	      Q.each(allViolations, function(index, vio) {
+	          if(vio.priority == prioName) count++;
+	      });
+	      return count;
+	  }
+	  
+	  function getSummary(allViolations) {
+	      var summary = '';
+	      Q.each(sonarPriorities, function(index, prio) {
+	          summary += getPrioHtmlImg(prio) + " " + prio + " " + countPrio(allViolations, prio) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	      });
+	      return summary;
+	  }  
+	
+	  function displayViolations(allViolations) {
+	      Q(divSelect).html(getSummary(allViolations));
+	      allViolations.sort(violationsComparator);
+	      var newViolations = [];
+	      var oldViolations = [];
+	      
+	      Q.each(allViolations, function(index, vio) {
+	          if(vio.isNew) {
+	          	newViolations.push(vio);
+	          } else {
+	          	oldViolations.push(vio);
+	          }
+	      });
+	      
+	      if(newViolations.length > 0) {
+	      	Q(divSelect).append('<h2>New Violations</h2>');
+	      	outputViolationsTable(newViolations);
+	      }
+	      Q(divSelect).append('<h2>Violations</h2>');
+	      outputViolationsTable(oldViolations);
+	  }
+	  
+	  function mergeResponsesAndDisplayViolations() {	  
+            var allViolations = [];
+        	Q.each(violationsByProject, function(index, violations) { 
+        		Q.merge(allViolations, violations);
+        	});
+        	displayViolations(allViolations);	  
+	  }
+	
+	  function loadViolationsForProject(project) {
+	  
+	      var loaderSpanId = 'projectLoader_'+project.replace(/[^a-zA-Z]+/g, "");
+	      Q(divSelect).append("Loading project " + project+": <span id='"+loaderSpanId+"'><img src='"+loaderImgSrc+"'/></span><br/>");
+	  
+	      var sonarPrios = sonarPriorities.join(",");
+	      var projectViolationsUrl = sonarBase + "/api/violations?format=json&depth=-1&priorities="+sonarPrios+"&resource=" + project;
+	      ajaxViaJenkins(projectViolationsUrl,  function(resp) {
+		        var text = resp.responseText;
+		        //console.log('resp text: ', text);
+		        if(text.substring(0,5) == 'ERROR') {
+		             Q('#'+loaderSpanId).html(text);
+		             return;
+		        }        
+		        var violations = resp.responseObject();
+		        
+		        var today = new Date();
+		        Q.each(violations, function(index, vio) { 
+					vio.createdDate = new Date(vio.createdAt);         
+					var difference = today.getTime() - vio.createdDate.getTime();
+					var daysDiff = Math.round(difference/(1000*60*60*24));
+					vio.isNew = ((daysDiff <= deltaDaysForNewIssues) && Q.inArray(vio.priority, sonarNewIssuesPriorities)>-1);      
+		        });
+		        violationsByProject[project] = violations;
+		        responsesReceived++;
+		        // console.log("responsesReceived="+responsesReceived);
+		        // console.log("sonarProjects length="+sonarProjects.length);
+		        
+		        Q('#'+loaderSpanId).html("loaded.");
+		        if(responsesReceived == sonarProjects.length) {
+					mergeResponsesAndDisplayViolations();
+		        }
+	        
+	      });      
+	  }
+	
+	  function loadProjects() {
+	      // run ajax in parallel
+	      Q.each(sonarProjects, function(index, project) { 
+	      	loadViolationsForProject(project);
+	      });
+	  }
+
+
+	  Q(document).ready(loadProjects);
+
+]]>
+
+}('${it.divId}', 
+	'${rootURL}', 
+	<st:bind value="${it}"/>.ajaxViaJenkins,
+	'${it.sonarBaseUrl}',
+	${it.sonarProjectsJson},
+	${it.sonarPrioritiesJson},
+	${it.sonarPriorityThreshold},
+	${it.maxEntries},
+	${it.deltaDaysForNewIssues},
+	${it.sonarNewIssuesPrioritiesJson},
+	${it.priorityValueByNameJson}
+);
+
+</script>
+
+</j:jelly>

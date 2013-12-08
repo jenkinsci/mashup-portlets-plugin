@@ -1,0 +1,19 @@
+<div>
+  The html id of the div container that will be filled by js. The js is called in a function context with variables defined:<br/>
+  <br/>
+  divId: The id of an empty div content can be written to with jquery <br/>
+  rootUrl: The jenkins root url <br/>
+  ajaxViaJenkins: a function to proxy ajax requests via jenkins in order to avoid the cross domain security restrictions (see https://wiki.jenkins-ci.org/display/JENKINS/AJAX+with+JavaScript+proxy on how to use this method)<br/>
+  <br/>
+  <strong>Example</strong> (loads the google search form): <br/><br/>
+var googleUrl = 'http://www.google.com';<br/>
+Q('#'+divId).html('Loading google home page result...'); <br/>
+ajaxViaJenkins(googleUrl, function(resp) { <br/>
+&nbsp;&nbsp;&nbsp;Q('#'+divId).html('Processing response (link rewriting, replacing this content)...'); <br/>
+&nbsp;&nbsp;&nbsp;var responseText = resp.responseText.replace(/(\/search)/g, googleUrl + '$1');<br/>
+&nbsp;&nbsp;&nbsp;var responseDom = Q("&lt;div>").append(responseText);<br/>
+&nbsp;&nbsp;&nbsp;Q('#'+divId).html( responseDom.find("form").first());<br/>
+});   <br/>
+<br/>
+
+</div>

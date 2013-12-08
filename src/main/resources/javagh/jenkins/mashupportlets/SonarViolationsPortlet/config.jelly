@@ -1,0 +1,24 @@
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+  <f:entry title="${%Name}" field="name">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="${%SonarBaseUrl}" field="sonarBaseUrl">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="${%SonarProjectsList}" field="sonarProjectsList">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="${%SonarPriorityThreshold}" field="sonarPriorityThreshold">
+     <f:select />
+  </f:entry>  
+  <f:entry title="${%MaxEntries}" field="maxEntries">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="${%SonarNewIssuesPriorityThreshold}" field="sonarNewIssuesPriorityThreshold">
+     <f:select />
+  </f:entry>        
+  <f:entry title="${%DeltaDaysForNewIssues}" field="deltaDaysForNewIssues">
+    <f:textbox />
+  </f:entry>  
+</j:jelly>
+

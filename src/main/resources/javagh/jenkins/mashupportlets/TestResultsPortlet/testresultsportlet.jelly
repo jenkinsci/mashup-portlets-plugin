@@ -1,0 +1,15 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" 
+	    xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
+      xmlns:dp="/hudson/plugins/view/dashboard">
+
+<div id="testResultsDiv_${it.id}"><img src="${rootURL}/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif"/></div>
+
+<st:include page="console-ie-fallback-js.jelly"/>
+<script type="text/javascript">
+Q(document).ready(function() {
+    Q('#testResultsDiv_${it.id}').load("${rootURL}/job/${it.jenkinsJobNameForUrl}/lastBuild/testReport/ #main-panel div:first");
+});  
+</script>
+
+</j:jelly>
+
