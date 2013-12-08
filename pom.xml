@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-    <!-- which version of Jenkins is this plugin built against? -->
+		<!-- which version of Jenkins is this plugin built against? -->
 		<version>1.526</version>
 	</parent>
 
