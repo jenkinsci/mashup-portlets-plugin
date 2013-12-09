@@ -10,6 +10,8 @@ td.sTableTop { vertical-align: top; }
 <div id="${it.divId}" align="left"></div>
 
 <st:include page="console-ie-fallback-js.jelly"/>
+
+<st:bind var="mashupPlugin" value="${it}"/>
 <script type="text/javascript"><![CDATA[
 
 new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, prioValueByName) {
@@ -177,7 +179,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 
 }('${it.divId}', 
 	'${rootURL}', 
-	<st:bind value="${it}"/>.ajaxViaJenkins,
+	mashupPlugin.ajaxViaJenkins,
 	'${it.sonarBaseUrl}',
 	${it.sonarProjectsJson},
 	${it.sonarPrioritiesJson},

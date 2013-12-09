@@ -11,6 +11,8 @@ td.sTableTop { vertical-align: top; }
 <div id="${it.divId}" align="left"><img src="${rootURL}/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif"/></div>
 
 <st:include page="console-ie-fallback-js.jelly"/>
+
+<st:bind var="mashupPlugin" value="${it}"/>
 <script type="text/javascript"><![CDATA[
 
 new function(divId, rootUrl, ajaxViaJenkins, sonarBaseUrl, limitToProjects, limitToStatus, maxEntries, displayMode, prioValueByName) {
@@ -144,7 +146,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBaseUrl, limitToProjects, limi
 
 }('${it.divId}', 
 	'${rootURL}', 
-	<st:bind value="${it}"/>.ajaxViaJenkins,
+	mashupPlugin.ajaxViaJenkins,
 	'${it.sonarBaseUrl}',
 	${it.limitToProjectsJson},
 	${it.limitToStatusJson},
