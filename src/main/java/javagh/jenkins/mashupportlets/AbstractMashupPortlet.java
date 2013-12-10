@@ -2,7 +2,8 @@ package javagh.jenkins.mashupportlets;
 
 import hudson.plugins.view.dashboard.DashboardPortlet;
 
-/** No code on java level, just on jelly include level.
+/** 
+ * No code on java level, just on jelly include level.
  *
  * @author G.Henzler
  *

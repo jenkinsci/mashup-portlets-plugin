@@ -5,6 +5,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Sonar Priorities used for configuration dropdowns.
+ * 
+ * @author G.Henzler
+ *
+ */
 public enum SonarPriority {
 
     INFO, MINOR, MAJOR, CRITICAL, BLOCKER;

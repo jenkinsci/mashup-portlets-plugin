@@ -6,6 +6,12 @@ import hudson.plugins.view.dashboard.DashboardPortlet;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
+/**
+ * Shows test results for a given job in a portlet.
+ * 
+ * @author G.Henzler
+ *
+ */
 public class TestResultsPortlet extends AbstractMashupPortlet {
 
 	private String jenkinsJobName;

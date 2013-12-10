@@ -2,6 +2,12 @@ package javagh.jenkins.mashupportlets;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Util methods.
+ * 
+ * @author G.Henzler
+ *
+ */
 public class Utils {
 
     public static String configListToJsonList(String configList) {

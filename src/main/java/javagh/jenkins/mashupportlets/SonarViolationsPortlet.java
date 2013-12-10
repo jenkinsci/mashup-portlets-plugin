@@ -11,6 +11,12 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
+/**
+ * Shows Sonar (version<=3.5) violations in a portlet.
+ * 
+ * @author G.Henzler
+ *
+ */
 public class SonarViolationsPortlet extends AbstractMashupPortlet {
 
     private static final int DEFAULT_PRIO_NO = -1;

@@ -10,6 +10,12 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
+/**
+ * Shows Sonar (version<=3.5) reviews in a portlet.
+ * 
+ * @author G.Henzler
+ *
+ */
 public class SonarReviewsPortlet extends AbstractMashupPortlet {
 
     private static final int DEFAULT_MAX_ENTRIES = 30;

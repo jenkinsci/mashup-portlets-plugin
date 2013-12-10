@@ -11,6 +11,12 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
+/**
+ * Shows SonarQube (Sonar >=3.6) issues in a portlet.
+ * 
+ * @author G.Henzler
+ *
+ */
 public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
     private static final int DEFAULT_PRIO_NO = -1;

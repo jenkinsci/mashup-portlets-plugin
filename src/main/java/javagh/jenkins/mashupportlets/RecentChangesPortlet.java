@@ -6,6 +6,12 @@ import hudson.plugins.view.dashboard.DashboardPortlet;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
+/**
+ * Shows the recent changes for a jenkins job in a portlet. 
+ * 
+ * @author G.Henzler
+ *
+ */
 public class RecentChangesPortlet extends AbstractMashupPortlet {
 
 	private String jenkinsJobName;

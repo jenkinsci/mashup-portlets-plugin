@@ -8,6 +8,12 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
+/**
+ * Generic JS Portlet for creating mashups. 
+ * 
+ * @author G.Henzler
+ *
+ */
 public class GenericJsPortlet extends AbstractMashupPortlet {
 	
 	private String javascript;
