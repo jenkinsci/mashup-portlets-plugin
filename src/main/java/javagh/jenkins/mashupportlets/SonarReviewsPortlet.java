@@ -30,7 +30,8 @@ public class SonarReviewsPortlet extends AbstractMashupPortlet {
         super(name);
         this.divId = "sonarDiv_" + getId();
 
-        this.sonarBaseUrl = sonarBaseUrl;
+        this.sonarBaseUrl = Utils.normalizeBaseUrl(sonarBaseUrl);   
+
         this.limitToProjects = limitToProjects;
 
         this.limitToStatus = limitToStatus;
@@ -90,7 +91,7 @@ public class SonarReviewsPortlet extends AbstractMashupPortlet {
 
         @Override
         public String getDisplayName() {
-            return "Sonar Reviews Portlet";
+            return "Sonar Reviews (Sonar <= 3.5)";
         }
 
         public ListBoxModel doFillDisplayModeItems() {

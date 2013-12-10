@@ -13,4 +13,12 @@ public class Utils {
         return json;
     }
 
+    public static  String normalizeBaseUrl(String sonarBaseUrl) {
+		if(sonarBaseUrl.endsWith("/")) {
+        	sonarBaseUrl = sonarBaseUrl.substring(0, sonarBaseUrl.length()-1);
+        }
+		return sonarBaseUrl;
+	}
+	
+    
 }

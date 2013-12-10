@@ -11,7 +11,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
-public class SonarViolationsPortlet extends AbstractMashupPortlet {
+public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
     private static final int DEFAULT_PRIO_NO = -1;
 
@@ -27,13 +27,14 @@ public class SonarViolationsPortlet extends AbstractMashupPortlet {
     private final String divId;
 
     @DataBoundConstructor
-    public SonarViolationsPortlet(String name, String sonarBaseUrl,
+    public SonarIssuesPortlet(String name, String sonarBaseUrl,
             String sonarProjectsList, int sonarPriorityThreshold,
             int maxEntries, int sonarNewIssuesPriorityThreshold,
             int deltaDaysForNewIssues, int violationDescriptionMaximumLength) {
         super(name);
         
         this.sonarBaseUrl = Utils.normalizeBaseUrl(sonarBaseUrl);   
+
         this.sonarProjectsList = sonarProjectsList;
 
         this.sonarPriorityThreshold = sonarPriorityThreshold;
@@ -46,8 +47,6 @@ public class SonarViolationsPortlet extends AbstractMashupPortlet {
 
         this.divId = "sonarDiv_" + getId();
     }
-
-
 
     public String getDivId() {
         return divId;
@@ -110,11 +109,11 @@ public class SonarViolationsPortlet extends AbstractMashupPortlet {
     }
 
     @Extension
-    public static class SonarViolationsPortletDescriptor extends Descriptor<DashboardPortlet> {
+    public static class SonarIssuesPortletDescriptor extends Descriptor<DashboardPortlet> {
 
         @Override
         public String getDisplayName() {
-            return "Sonar Violations (Sonar <= 3.5)";
+            return "SonarQube Issues";
         }
 
         public ListBoxModel doFillSonarPriorityThresholdItems() {

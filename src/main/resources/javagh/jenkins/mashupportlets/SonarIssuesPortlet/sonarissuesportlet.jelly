@@ -1,0 +1,180 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" 
+	    xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
+      xmlns:dp="/hudson/plugins/view/dashboard">
+
+<style>
+td.sTableTop { vertical-align: top; }
+.sMessage { white-space: normal; }
+</style>
+
+<div id="${it.divId}" align="left"></div>
+
+<st:include page="console-ie-fallback-js.jelly"/>
+
+<st:bind var="mashupPlugin" value="${it}"/>
+<script type="text/javascript"><![CDATA[
+
+new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, prioValueByName) {
+
+	  var divSelect = "#" + divId;
+	  var loaderImgSrc = rootUrl+'/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif';
+	
+	  var issuesByProject = {};
+	  var responsesReceived = 0;  
+	
+	  function getPrioHtmlImg(prio) {
+	      var imgHtml = '<img src="'+sonarBase+'/images/priority/'+prioValueByName[prio]+'.png" border="0" alt="'+prio+'"/>';
+	      return imgHtml;        
+	  }
+	    
+	
+	  function outputIssue(index, issue) {
+	  
+	     var message = issue.message;
+	     // remove long java package paths in message
+	     message = message.replace(/\b([a-z]+\.)+([A-Za-z0-9]+)/g, "$$2");
+	     
+	     var issueLinkParams = '?tab=violations&metric=info_violations&rule='+issue.severity; // key does not work anymore in 3.3.1 violation.rule.key; 
+	     var issueLink = sonarBase + '/resource/index/' + issue.component + issueLinkParams;  
+	          
+	     Q(divSelect+' table:last').append('<tr '+(issue.isNew?'bgcolor="#FFFF66"':'')+'><td>'+getPrioHtmlImg([issue.severity])
+	              +'</td><td class="sMessage" style="white-space:normal"><a href="'+issueLink+'" target="_blank">'+message+ 
+	              "</a><br/>in " + issue.component 
+	              +'</td><td class="sTableTop">' + issue.creationDate.toISOString().substring(0, 19).replace('T',' ') + '</td></tr>'
+	              );	  
+
+	     if(index == maxEntries-1) {
+	     	return false;
+	     }
+	  }
+	  
+	  function ooutputIssuesTable(issues) {
+	      Q(divSelect).append('<table class="pane bigtable"><th align="left">Prio.</th><th align="left" width="850">Message</th><th align="left">Created</th></table>');
+	      Q.each(issues, outputIssue);
+	      if(issues.length>maxEntries) {
+	      	Q(divSelect).append( ('' + issues.length-maxEntries) + ' more validations in <a href="'+sonarBase+'" target="sonar">Sonar</a>');
+	      }
+	  }  
+	
+	  function issuesComparator(issueA, issueB) {
+	      var prioA = prioValueByName[issueA.severity]; 
+	      var prioB = prioValueByName[issueB.severity];
+	      if(prioA == prioB) {
+	      	return issueB.creationDate.getTime() - issueA.creationDate.getTime();
+	      } 
+	      return prioB - prioA;        
+	  }
+	
+	  function countPrio(allIssues, prioName) {
+	      var count = 0;
+	      Q.each(allIssues, function(index, issue) {
+	          if(issue.severity == prioName) count++;
+	      });
+	      return count;
+	  }
+	  
+	  function getSummary(allIssues) {
+	      var summary = '';
+	      Q.each(sonarPriorities, function(index, prio) {
+	          summary += getPrioHtmlImg(prio) + " " + prio + " " + countPrio(allIssues, prio) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	      });
+	      return summary;
+	  }  
+	
+	  function displayIssues(allIssues) {
+	      Q(divSelect).html(getSummary(allIssues));
+	      allIssues.sort(issuesComparator);
+	      var newIssues = [];
+	      var oldIssues = [];
+	      
+	      Q.each(allIssues, function(index, issue) {
+	          if(issue.isNew) {
+	          	newIssues.push(issue);
+	          } else {
+	          	oldIssues.push(issue);
+	          }
+	      });
+	      
+	      if(newIssues.length > 0) {
+	      	Q(divSelect).append('<h2>New Issues</h2>');
+	      	ooutputIssuesTable(newIssues);
+	      }
+	      Q(divSelect).append('<h2>Issues</h2>');
+	      ooutputIssuesTable(oldIssues);
+	  }
+	  
+	  function mergeResponsesAndDisplayIssues() {	  
+            var allIssues = [];
+        	Q.each(issuesByProject, function(index, issues) { 
+        		Q.merge(allIssues, issues);
+        	});
+        	displayIssues(allIssues);	  
+	  }
+	
+	  function loadIssuesForProject(project) {
+	  
+	      var loaderSpanId = 'projectLoader_'+project.replace(/[^a-zA-Z]+/g, "");
+	      Q(divSelect).append("Loading project " + project+": <span id='"+loaderSpanId+"'><img src='"+loaderImgSrc+"'/></span><br/>");
+	  
+	      var sonarPrios = sonarPriorities.join(",");
+	      var projectIssuesUrl = sonarBase + "/api/issues/search?format=json&pageSize=-1&severities="+sonarPrios+"&componentRoots=" + project;
+	      console.log('projectIssuesUrl: ', projectIssuesUrl);
+	      ajaxViaJenkins(projectIssuesUrl,  function(resp) {
+		        var text = resp.responseText;
+		        
+		        if(text.substring(0,5) == 'ERROR') {
+		             Q('#'+loaderSpanId).html(text);
+		             return;
+		        }        
+		        var responseObject = resp.responseObject();
+		        var issues = responseObject.issues;
+		        console.log('issues: ', issues);
+		        
+		        var today = new Date();
+		        Q.each(issues, function(index, issue) { 
+					issue.creationDate = new Date(issue.creationDate);         
+					var difference = today.getTime() - issue.creationDate.getTime();
+					var daysDiff = Math.round(difference/(1000*60*60*24));
+					issue.isNew = ((daysDiff <= deltaDaysForNewIssues) && Q.inArray(issue.severity, sonarNewIssuesPriorities)>-1);      
+		        });
+		        issuesByProject[project] = issues;
+		        responsesReceived++;
+		        // console.log("responsesReceived="+responsesReceived);
+		        // console.log("sonarProjects length="+sonarProjects.length);
+		        
+		        Q('#'+loaderSpanId).html("loaded.");
+		        if(responsesReceived == sonarProjects.length) {
+					mergeResponsesAndDisplayIssues();
+		        }
+	        
+	      });      
+	  }
+	
+	  function loadProjects() {
+	      // run ajax in parallel
+	      Q.each(sonarProjects, function(index, project) { 
+	      	loadIssuesForProject(project);
+	      });
+	  }
+
+
+	  Q(document).ready(loadProjects);
+
+]]>
+
+}('${it.divId}', 
+	'${rootURL}', 
+	mashupPlugin.ajaxViaJenkins,
+	'${it.sonarBaseUrl}',
+	${it.sonarProjectsJson},
+	${it.sonarPrioritiesJson},
+	${it.sonarPriorityThreshold},
+	${it.maxEntries},
+	${it.deltaDaysForNewIssues},
+	${it.sonarNewIssuesPrioritiesJson},
+	${it.priorityValueByNameJson}
+);
+
+</script>
+
+</j:jelly>
