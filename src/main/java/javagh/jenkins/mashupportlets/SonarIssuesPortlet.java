@@ -47,7 +47,8 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
         this.divId = "sonarDiv_" + getId();
     }
-
+    
+    
     public String getDivId() {
         return divId;
     }

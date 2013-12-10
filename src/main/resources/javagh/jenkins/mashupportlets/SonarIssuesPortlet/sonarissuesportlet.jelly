@@ -7,7 +7,7 @@ td.sTableTop { vertical-align: top; }
 .sMessage { white-space: normal; }
 </style>
 
-<div id="${it.divId}" align="left"></div>
+<div id="${it.divId}" align="left">Loading issues... <img src="${rootURL}/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif" /></div>
 
 <st:include page="console-ie-fallback-js.jelly"/>
 
@@ -17,17 +17,12 @@ td.sTableTop { vertical-align: top; }
 new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, prioValueByName) {
 
 	  var divSelect = "#" + divId;
-	  var loaderImgSrc = rootUrl+'/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif';
-	
-	  var issuesByProject = {};
-	  var responsesReceived = 0;  
 	
 	  function getPrioHtmlImg(prio) {
 	      var imgHtml = '<img src="'+sonarBase+'/images/priority/'+prioValueByName[prio]+'.png" border="0" alt="'+prio+'"/>';
 	      return imgHtml;        
 	  }
 	    
-	
 	  function outputIssue(index, issue) {
 	  
 	     var message = issue.message;
@@ -48,7 +43,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 	     }
 	  }
 	  
-	  function ooutputIssuesTable(issues) {
+	  function outputIssuesTable(issues) {
 	      Q(divSelect).append('<table class="pane bigtable"><th align="left">Prio.</th><th align="left" width="850">Message</th><th align="left">Created</th></table>');
 	      Q.each(issues, outputIssue);
 	      if(issues.length>maxEntries) {
@@ -97,28 +92,21 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 	      
 	      if(newIssues.length > 0) {
 	      	Q(divSelect).append('<h2>New Issues</h2>');
-	      	ooutputIssuesTable(newIssues);
+	      	outputIssuesTable(newIssues);
 	      }
 	      Q(divSelect).append('<h2>Issues</h2>');
-	      ooutputIssuesTable(oldIssues);
+	      outputIssuesTable(oldIssues);
 	  }
-	  
-	  function mergeResponsesAndDisplayIssues() {	  
-            var allIssues = [];
-        	Q.each(issuesByProject, function(index, issues) { 
-        		Q.merge(allIssues, issues);
-        	});
-        	displayIssues(allIssues);	  
-	  }
+
 	
-	  function loadIssuesForProject(project) {
+	  function loadIssues() {
 	  
-	      var loaderSpanId = 'projectLoader_'+project.replace(/[^a-zA-Z]+/g, "");
-	      Q(divSelect).append("Loading project " + project+": <span id='"+loaderSpanId+"'><img src='"+loaderImgSrc+"'/></span><br/>");
+	      Q(divSelect).append("<br/><br/>Projects:<br/>" + sonarProjects.join('<br/>')+"<br/>");	  
 	  
-	      var sonarPrios = sonarPriorities.join(",");
-	      var projectIssuesUrl = sonarBase + "/api/issues/search?format=json&pageSize=-1&severities="+sonarPrios+"&componentRoots=" + project;
-	      console.log('projectIssuesUrl: ', projectIssuesUrl);
+	      var componentRoots = sonarProjects.join(",");
+	      var sonarSeverities = sonarPriorities.join(",");
+	      var projectIssuesUrl = sonarBase + "/api/issues/search?format=json&pageSize=-1&severities="+sonarSeverities+"&componentRoots=" + componentRoots;
+	      // console.log('projectIssuesUrl: ', projectIssuesUrl);
 	      ajaxViaJenkins(projectIssuesUrl,  function(resp) {
 		        var text = resp.responseText;
 		        
@@ -137,30 +125,12 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 					var daysDiff = Math.round(difference/(1000*60*60*24));
 					issue.isNew = ((daysDiff <= deltaDaysForNewIssues) && Q.inArray(issue.severity, sonarNewIssuesPriorities)>-1);      
 		        });
-		        issuesByProject[project] = issues;
-		        responsesReceived++;
-		        // console.log("responsesReceived="+responsesReceived);
-		        // console.log("sonarProjects length="+sonarProjects.length);
-		        
-		        Q('#'+loaderSpanId).html("loaded.");
-		        if(responsesReceived == sonarProjects.length) {
-					mergeResponsesAndDisplayIssues();
-		        }
-	        
+
+		        displayIssues(issues);
 	      });      
 	  }
-	
-	  function loadProjects() {
-	      // run ajax in parallel
-	      Q.each(sonarProjects, function(index, project) { 
-	      	loadIssuesForProject(project);
-	      });
-	  }
 
-
-	  Q(document).ready(loadProjects);
-
-]]>
+	  Q(document).ready(loadIssues);
 
 }('${it.divId}', 
 	'${rootURL}', 
@@ -175,6 +145,6 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 	${it.priorityValueByNameJson}
 );
 
-</script>
+]]></script>
 
 </j:jelly>
