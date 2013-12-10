@@ -5,8 +5,7 @@ Additional portlets for jenkins Dashboards (see https://wiki.jenkins-ci.org/disp
 
 - Generic JS Portlet: Allows to run arbitrary JS to create content in the portlet 
   content area (if the user has edit rights for the given Dashboard View). The function ajaxViaJenkins() 
-  allows running any ajax request without cross domain 
-  issues (using https://wiki.jenkins-ci.org/display/JENKINS/AJAX+with+JavaScript+proxy)
+  allows running ajax requests avoiding cross domain issues by routing them through jenkins
 - Recent Changes Portlet: Will show the recent SCM changes of a configured project
 - SonarQube Issues Portlet: Shows issues for the given projects (projects and severity can be configured)
 - Sonar Violations Portlet (Sonar <=3.5): Shows violations for the given projects (projects and severity can be configured)
