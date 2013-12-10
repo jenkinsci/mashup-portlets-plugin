@@ -25,12 +25,15 @@ public class SonarViolationsPortlet extends AbstractMashupPortlet {
     private final int deltaDaysForNewIssues;
 
     private final String divId;
+    
+    private final String sonarApiUser;
+    private final String sonarApiPw;
 
     @DataBoundConstructor
     public SonarViolationsPortlet(String name, String sonarBaseUrl,
             String sonarProjectsList, int sonarPriorityThreshold,
             int maxEntries, int sonarNewIssuesPriorityThreshold,
-            int deltaDaysForNewIssues, int violationDescriptionMaximumLength) {
+            int deltaDaysForNewIssues, int violationDescriptionMaximumLength, String sonarApiUser, String sonarApiPw) {
         super(name);
         
         this.sonarBaseUrl = Utils.normalizeBaseUrl(sonarBaseUrl);   
@@ -44,6 +47,9 @@ public class SonarViolationsPortlet extends AbstractMashupPortlet {
 
         this.deltaDaysForNewIssues = deltaDaysForNewIssues;
 
+        this.sonarApiUser = sonarApiUser;
+        this.sonarApiPw = sonarApiPw;
+        
         this.divId = "sonarDiv_" + getId();
     }
 
@@ -104,9 +110,9 @@ public class SonarViolationsPortlet extends AbstractMashupPortlet {
         return SonarPriority.getPriorityValueByNameJson();
     }
 
-    @JavaScriptMethod
+	@JavaScriptMethod
     public HttpResponse ajaxViaJenkins(String urlStr) {
-        return new ServerSideHttpCall(urlStr);
+		return new ServerSideHttpCall(urlStr, sonarApiUser, sonarApiPw);
     }
 
     @Extension

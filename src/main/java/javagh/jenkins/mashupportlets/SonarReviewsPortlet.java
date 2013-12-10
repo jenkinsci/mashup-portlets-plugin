@@ -23,10 +23,13 @@ public class SonarReviewsPortlet extends AbstractMashupPortlet {
     private final String displayMode;
 
     private final String divId;
+    
+    private final String sonarApiUser;
+    private final String sonarApiPw;
 
     @DataBoundConstructor
     public SonarReviewsPortlet(String name, String sonarBaseUrl,
-            int maxEntries, String limitToProjects, String limitToStatus, String displayMode) {
+            int maxEntries, String limitToProjects, String limitToStatus, String displayMode, String sonarApiUser, String sonarApiPw) {
         super(name);
         this.divId = "sonarDiv_" + getId();
 
@@ -37,6 +40,9 @@ public class SonarReviewsPortlet extends AbstractMashupPortlet {
         this.limitToStatus = limitToStatus;
         this.maxEntries = maxEntries;
         this.displayMode = displayMode;
+        
+        this.sonarApiUser = sonarApiUser;
+        this.sonarApiPw = sonarApiPw;
 
     }
 
@@ -78,9 +84,9 @@ public class SonarReviewsPortlet extends AbstractMashupPortlet {
         return SonarPriority.getPriorityValueByNameJson();
     }
 
-    @JavaScriptMethod
+	@JavaScriptMethod
     public HttpResponse ajaxViaJenkins(String urlStr) {
-        return new ServerSideHttpCall(urlStr);
+		return new ServerSideHttpCall(urlStr, sonarApiUser, sonarApiPw);
     }
 
     @Extension

@@ -5,7 +5,7 @@
 <div id="${it.containerDivId}" align="left"><img src="${rootURL}/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif"/></div>
 <st:include page="console-ie-fallback-js.jelly"/>
 
-<st:bind var="mashupPlugin" value="${it}"/>
+<st:bind var="mashupPlugin_${it.id}" value="${it}"/>
 
 <script type="text/javascript">
 
@@ -15,7 +15,7 @@ new function(divId, rootUrl, ajaxViaJenkins) {
 	${it.javascript}
 	
 /// GENERIC JS CONTENT ENDS HERE	
-}("${it.containerDivId}", "${rootURL}", mashupPlugin.ajaxViaJenkins);
+}("${it.containerDivId}", "${rootURL}", mashupPlugin_${it.id}.ajaxViaJenkins);
 
 </script>
 

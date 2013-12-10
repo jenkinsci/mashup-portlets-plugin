@@ -2,11 +2,16 @@
   The javascript to populate the portlet. JQuery is available as 'Q' and console.log() is ensured to work even in IE. 
   The js is called in a function context with variables defined:<br/>
   <br/>
-  divId: The id of an empty div content can be written to with jquery <br/>
-  rootUrl: The jenkins root url <br/>
-  ajaxViaJenkins: a function to proxy ajax requests via jenkins in order to avoid the cross domain security restrictions (see https://wiki.jenkins-ci.org/display/JENKINS/AJAX+with+JavaScript+proxy on how to use this method)<br/>
-  <br/>
-  <strong>Example</strong> (loads the google search form): <br/><br/>
+  <ul>
+  	<li>divId: The id of an empty div content can be written to with jquery</li>
+  	<li>rootUrl: The jenkins root url </li>
+  	<li>ajaxViaJenkins: a function to proxy ajax requests via jenkins in order to avoid the cross domain security 
+  	restrictions (see https://wiki.jenkins-ci.org/display/JENKINS/AJAX+with+JavaScript+proxy for implementation details). The first 
+  	argument is the url, as a second and third argument credentials can be passed in (optional). The last argument is the callback 
+  	function that receives the response object.</li>
+  </ul>
+   <br/>
+  <strong>Examples</strong><br/><i>// Google Search Form</i><br/>
 var googleUrl = 'http://www.google.com';<br/>
 Q('#'+divId).html('Loading google home page result...'); <br/>
 ajaxViaJenkins(googleUrl, function(resp) { <br/>
@@ -15,6 +20,16 @@ ajaxViaJenkins(googleUrl, function(resp) { <br/>
 &nbsp;&nbsp;&nbsp;var responseDom = Q("&lt;div>").append(responseText);<br/>
 &nbsp;&nbsp;&nbsp;Q('#'+divId).html( responseDom.find("form").first());<br/>
 });   <br/>
+ <br/>
+  <i>// Load JSON from API with authentication</i><br/>
+var url = 'http://myservice.intranet/api/rest';<br/>
+Q('#'+divId).html('Loading portlet...'); <br/>
+ajaxViaJenkins(url, "myuser", "password", function(resp) { <br/>
+&nbsp;&nbsp;&nbsp;var jsonObject = resp.responseObject();<br/>
+&nbsp;&nbsp;&nbsp;...<br/>
+});   <br/>
+
+
 <br/>
 
 </div>

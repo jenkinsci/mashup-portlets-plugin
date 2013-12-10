@@ -30,8 +30,8 @@ public class GenericJsPortlet extends AbstractMashupPortlet {
 	}
 
 	@JavaScriptMethod
-    public HttpResponse ajaxViaJenkins(String urlStr) {
-		return new ServerSideHttpCall(urlStr);
+    public HttpResponse ajaxViaJenkins(String urlStr, String user, String pw) {
+		return new ServerSideHttpCall(urlStr, user, pw);
     }
 
 	@Extension

@@ -23,6 +23,13 @@
 	  <f:entry title="${%DeltaDaysForNewIssues}" field="deltaDaysForNewIssues">
 	    <f:textbox />
 	  </f:entry>  	
+	  <f:entry title="${%SonarApiUser}" field="sonarApiUser">
+	    <f:textbox />
+	  </f:entry> 	
+	  <f:entry title="${%SonarApiPw}" field="sonarApiPw">
+	    <f:password />
+	  </f:entry> 		    
+	  
   </f:advanced>
  
   
