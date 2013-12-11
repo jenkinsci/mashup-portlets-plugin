@@ -11,6 +11,15 @@
 	<artifactId>jenkins-mashup-portlets</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>hpi</packaging>
+	
+	<name>Mashup Portlets</name>
+	<description>
+		Additional Dashboard Portlets: 
+		Generic JS Portlet (lets you pull in arbitrary content via JS), 
+		Recent Changes Portlet (shows the SCM changes for a given job), 
+		SonarQube Portlets (show SonarQube statistics directly in Jenkins) 
+		and Test Results Portlet (shows the test results for a given job).
+	</description>
 
 	<scm>
 		<connection>scm:git:ssh://github.com/ghenzler/jenkins-mashup-portlets.git</connection>

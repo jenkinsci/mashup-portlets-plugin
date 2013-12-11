@@ -1,6 +1,3 @@
-<!--
-  This view is used to render the plugin list page.
--->
 <div>
-  This plugin provides new dashboard portlets: Sonar Portlet, Recent Changes Portlet, Test Results Portlet and a Generic JS Portlet.
+  Additional Dashboard Portlets: Generic JS Portlet (lets you pull in arbitrary content via JS), Recent Changes Portlet (shows the SCM changes for a given job), SonarQube Portlets (show SonarQube statistics directly in Jenkins) and Test Results Portlet (shows the test results for a given job).
 </div>
