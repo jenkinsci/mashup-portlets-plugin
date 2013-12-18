@@ -11,4 +11,6 @@ Additional portlets for jenkins Dashboards (see https://wiki.jenkins-ci.org/disp
 - Sonar Violations Portlet (Sonar <=3.5): Shows violations for the given projects (projects and severity can be configured)
 - Sonar Reviews Portlet (Sonar <=3.5): Shows open sonar reviews
 
+NOTE: The SonarQube portlets will be moved to https://wiki.jenkins-ci.org/display/JENKINS/SonarQube+plugin soon.
+
 See help sections in portlet configuration for more information.
