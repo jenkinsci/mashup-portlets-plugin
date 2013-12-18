@@ -23,8 +23,8 @@
 	<url>https://wiki.jenkins-ci.org/display/JENKINS/Mashup+Portlets</url>
 
 	<scm>
-		<connection>scm:git:https://github.com/jenkinsci/mashup-portlets-plugin.git</connection>
-		<developerConnection>scm:git:https://git@github.com/jenkinsci/mashup-portlets-plugin.git</developerConnection>
+		<connection>scm:git:git://github.com/jenkinsci/mashup-portlets-plugin.git</connection>
+		<developerConnection>scm:git:git://git@github.com/jenkinsci/mashup-portlets-plugin.git</developerConnection>
 		<url>https://github.com/jenkinsci/mashup-portlets-plugin</url>
 	</scm>
 
