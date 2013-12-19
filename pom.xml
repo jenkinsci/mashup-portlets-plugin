@@ -27,15 +27,6 @@
 		<developerConnection>scm:git:https://github.com/jenkinsci/mashup-portlets-plugin.git</developerConnection>
 		<url>https://github.com/jenkinsci/mashup-portlets-plugin</url>
 	</scm>
-	
-	<!--  
-	<scm>
-		<connection>scm:git:ssh://github.com/jenkinsci/mashup-portlets-plugin.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com:jenkinsci/mashup-portlets-plugin.git</developerConnection>
-		<url>https://github.com/jenkinsci/mashup-portlets-plugin</url>
-	</scm>	-->
-
-
 
 	<developers>
 		<developer>
