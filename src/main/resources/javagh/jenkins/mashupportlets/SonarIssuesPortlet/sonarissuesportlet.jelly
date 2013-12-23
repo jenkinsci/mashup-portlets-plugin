@@ -7,7 +7,7 @@ td.sTableTop { vertical-align: top; }
 .sMessage { white-space: normal; }
 </style>
 
-<div id="${it.divId}" align="left">Loading issues... <img src="${rootURL}/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif" /></div>
+<div id="${it.divId}" align="left">Loading issues... <img src="${rootURL}/plugin/mashup-portlets-plugin/ajax-loader-bar.gif" /></div>
 
 <st:include page="console-ie-fallback-js.jelly"/>
 

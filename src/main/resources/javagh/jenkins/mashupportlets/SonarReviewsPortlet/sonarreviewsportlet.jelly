@@ -8,7 +8,7 @@ td.sTableTop { vertical-align: top; }
 #sonarReviewsTable TH { text-align: left; }
 </style>
 
-<div id="${it.divId}" align="left"><img src="${rootURL}/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif"/></div>
+<div id="${it.divId}" align="left"><img src="${rootURL}/plugin/mashup-portlets-plugin/ajax-loader-bar.gif"/></div>
 
 <st:include page="console-ie-fallback-js.jelly"/>
 
@@ -18,7 +18,7 @@ td.sTableTop { vertical-align: top; }
 new function(divId, rootUrl, ajaxViaJenkins, sonarBaseUrl, limitToProjects, limitToStatus, maxEntries, displayMode, prioValueByName) {
 
 	var divSelect = "#" + divId;	  
-	var loaderImgSrc = rootUrl+'/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif';
+	var loaderImgSrc = rootUrl+'/plugin/mashup-portlets-plugin/ajax-loader-bar.gif';
 	var sonarReviewDetailUrl = sonarBaseUrl  + '/project_reviews/view/';
 	var sonarReviewListUrl = sonarBaseUrl  + '/reviews';
 	

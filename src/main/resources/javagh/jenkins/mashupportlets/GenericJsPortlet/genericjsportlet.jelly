@@ -2,7 +2,7 @@
 	    xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
       xmlns:dp="/hudson/plugins/view/dashboard">
 
-<div id="${it.containerDivId}" align="left"><img src="${rootURL}/plugin/jenkins-mashup-portlets/ajax-loader-bar.gif"/></div>
+<div id="${it.containerDivId}" align="left"><img src="${rootURL}/plugin/mashup-portlets-plugin/ajax-loader-bar.gif"/></div>
 <st:include page="console-ie-fallback-js.jelly"/>
 
 <st:bind var="mashupPlugin_${it.id}" value="${it}"/>
