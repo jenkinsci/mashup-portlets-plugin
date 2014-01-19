@@ -12,6 +12,13 @@
      <f:select />
   </f:entry>    
   
+  <f:entry title="${%SonarAssigneeStatus}" field="sonarAssigneeStatus">
+     <f:select />
+  </f:entry>   
+  
+  <f:entry title="${%SonarShowAssigneeBar}" field="sonarShowAssigneeBar">
+     <f:checkbox name="sonarShowAssigneeBar" value="true" checked="${it.isSonarShowAssigneeBar()}" />
+  </f:entry>   
 
   <f:advanced>
 	  <f:entry title="${%MaxEntries}" field="maxEntries">

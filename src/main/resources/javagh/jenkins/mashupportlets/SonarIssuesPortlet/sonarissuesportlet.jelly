@@ -14,15 +14,43 @@ td.sTableTop { vertical-align: top; }
 <st:bind var="mashupPlugin_${it.id}" value="${it}"/>
 <script type="text/javascript"><![CDATA[
 
-new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, prioValueByName) {
+new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, 
+	sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, 
+	prioValueByName, sonarAssigneeStatus, assigneeStatusValueByNameJson, sonarShowAssigneeBar) 
+{
 
 	  var divSelect = "#" + divId;
+	  var userNameLookupTable = {};
+	  var UNASSIGNED = "unassigned";
 	
 	  function getPrioHtmlImg(prio) {
 	      var imgHtml = '<img src="'+sonarBase+'/images/priority/'+prioValueByName[prio]+'.png" border="0" alt="'+prio+'"/>';
 	      return imgHtml;        
 	  }
-	    
+
+	  function getUserNameForLogin(login) {
+	      var name = UNASSIGNED;
+	      if(login) {
+		      var name = userNameLookupTable[login];
+		      if(!name) {
+		          name = login;
+		      }
+	      }
+	      return name;	  		
+	  }
+	  
+	  function getUserNameWithLinkForLogin(login) {
+	      if(login) {
+		      var name = getUserNameForLogin(login);
+		      var link = sonarBase+'/issues/search?assignees='+login+'&sort=SEVERITY&asc=false';
+		      var linkHtml = '<a href="'+link+'" target="_blank">'+name+'</a>';
+		      return linkHtml;		      
+	      } else {
+	      	  return UNASSIGNED;
+	      }
+  		
+	  }
+
 	  function outputIssue(index, issue) {
 	  
 	     var message = issue.message;
@@ -31,12 +59,19 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 	     
 	     var issueLinkParams = '?tab=violations&metric=info_violations&rule='+issue.severity; // key does not work anymore in 3.3.1 violation.rule.key; 
 	     var issueLink = sonarBase + '/resource/index/' + issue.component + issueLinkParams;  
-	          
-	     Q(divSelect+' table:last').append('<tr '+(issue.isNew?'bgcolor="#FFFF66"':'')+'><td>'+getPrioHtmlImg([issue.severity])
+	            	      
+	     var assignedColumnHtml = '';
+	     if(!showOnlyUnassigned()) {
+	     	assignedColumnHtml = '<td class="sTableTop">' + getUserNameWithLinkForLogin(issue.assignee) + '</td>';
+	     }   
+	    	     
+	     var rowHtml = '<tr '+(issue.isNew?'bgcolor="#FFFF66"':'')+'><td>'+getPrioHtmlImg([issue.severity])
 	              +'</td><td class="sMessage" style="white-space:normal"><a href="'+issueLink+'" target="_blank">'+message+ 
-	              "</a><br/>in " + issue.component 
-	              +'</td><td class="sTableTop">' + issue.creationDate.toISOString().substring(0, 19).replace('T',' ') + '</td></tr>'
-	              );	  
+	              "</a><br/>in " + issue.component  +'</td>'
+	              + assignedColumnHtml
+	              +'<td class="sTableTop">' + issue.creationDate.toISOString().substring(0, 19).replace('T',' ') + '</td></tr>';       	          
+	            	          
+	     Q(divSelect+' table:last').append(rowHtml);	  
 
 	     if(index == maxEntries-1) {
 	     	return false;
@@ -44,7 +79,12 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 	  }
 	  
 	  function outputIssuesTable(issues) {
-	      Q(divSelect).append('<table class="pane bigtable"><th align="left">Prio.</th><th align="left" width="850">Message</th><th align="left">Created</th></table>');
+	      var colAssigneeHtml = '';	  	
+	      if(!showOnlyUnassigned()) {
+	      	colAssigneeHtml = '<th align="left" width="100">Assignee</th>';
+	      }
+	        	
+	      Q(divSelect).append('<table class="pane bigtable"><th align="left">Prio.</th><th align="left" width="850">Message</th>'+colAssigneeHtml+'<th align="left">Created</th></table>');
 	      Q.each(issues, outputIssue);
 	      if(issues.length>maxEntries) {
 	      	Q(divSelect).append( ('' + issues.length-maxEntries) + ' more validations in <a href="'+sonarBase+'" target="sonar">Sonar</a>');
@@ -76,8 +116,51 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 	      return summary;
 	  }  
 	
+	  function renderAssigneeBar(allIssues) {
+	      Q(divSelect).append("<strong>Busiest Assignees: </strong>");
+	      
+	      var issueCountObjByLogin = {};
+	      var issueCountObjArr = [];
+	      Q.each(allIssues, function(index, issue) {
+	         if(issue.assignee) {
+	         	if(!issueCountObjByLogin[issue.assignee]) {
+	         		var issueCountObj = { login: issue.assignee, issueCount: 1 };
+	         		issueCountObjByLogin[issue.assignee] = issueCountObj;
+	         		issueCountObjArr.push(issueCountObj);
+	         	} else {
+	         		issueCountObjByLogin[issue.assignee].issueCount = issueCountObjByLogin[issue.assignee].issueCount + 1;	         		 
+	         	}
+	         }
+	      });
+	      
+	      issueCountObjArr.sort(function(countObjA, countObjB) { return countObjB.issueCount - countObjA.issueCount;  });
+	      
+
+	      
+	      Q.each(issueCountObjArr, function(index, issueCountObj) {
+	      	Q(divSelect).append( (index>0 ?', ':'') + getUserNameWithLinkForLogin(issueCountObj.login) + ' ('+issueCountObj.issueCount+')');
+	      	if((index+1) >= 5) {
+	      	   return false;
+	      	}
+	      });
+	      
+	      if(issueCountObjArr.length == 0) {
+	      	Q(divSelect).append('<i>no assignees found</i>');
+	      }
+	      
+	      Q(divSelect).append('<br /><br />');
+	  }  	
+	
 	  function displayIssues(allIssues) {
-	      Q(divSelect).html(getSummary(allIssues));
+	  
+	      Q(divSelect).html("");
+	      
+	      if(sonarShowAssigneeBar && !showOnlyUnassigned()) {
+	      	  renderAssigneeBar(allIssues);
+	      }
+	      
+	      Q(divSelect).append(getSummary(allIssues));
+	      
 	      allIssues.sort(issuesComparator);
 	      var newIssues = [];
 	      var oldIssues = [];
@@ -98,6 +181,34 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 	      outputIssuesTable(oldIssues);
 	  }
 
+	  function showOnlyUnassigned() {
+	       return assigneeStatusValueByNameJson['UNASSIGNED'] == sonarAssigneeStatus;
+	  }	
+
+	  function showOnlyAssigned() {
+	       return assigneeStatusValueByNameJson['ASSIGNED'] == sonarAssigneeStatus;
+	  }		  
+
+	  function isRelevant(issue) {
+        	var isAssigned = false;
+        	if(issue.assignee) {
+        		isAssigned = true;
+        	}
+        	var isRelevant = true;
+        	if(showOnlyUnassigned()) {
+        		isRelevant = !isAssigned;
+        	} else if(showOnlyAssigned()) {
+        		isRelevant = isAssigned;
+        	}	  
+	  		return isRelevant;
+	  }
+	
+	  function populateUserNameLookupTable(users) {
+	        Q.each(users, function(index, user) { 
+	        	userNameLookupTable[user.login] = user.name;
+	        });	
+	  }	
+
 	
 	  function loadIssues() {
 	  
@@ -115,18 +226,31 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 		             return;
 		        }        
 		        var responseObject = resp.responseObject();
-		        var issues = responseObject.issues;
-		        console.log('issues: ', issues);
+
+				populateUserNameLookupTable(responseObject.users);
+		        
+		        // console.log('issues in response: ', responseObject.issues);
+		        
+		        var relevantIssues = [];
 		        
 		        var today = new Date();
-		        Q.each(issues, function(index, issue) { 
-					issue.creationDate = new Date(issue.creationDate);         
-					var difference = today.getTime() - issue.creationDate.getTime();
-					var daysDiff = Math.round(difference/(1000*60*60*24));
-					issue.isNew = ((daysDiff <= deltaDaysForNewIssues) && Q.inArray(issue.severity, sonarNewIssuesPriorities)>-1);      
+		        Q.each(responseObject.issues, function(index, issue) { 
+
+		        	if(isRelevant(issue)) {
+						issue.creationDate = new Date(issue.creationDate);         
+						var difference = today.getTime() - issue.creationDate.getTime();
+						var daysDiff = Math.round(difference/(1000*60*60*24));
+						issue.isNew = ((daysDiff <= deltaDaysForNewIssues) && Q.inArray(issue.severity, sonarNewIssuesPriorities)>-1);   
+						
+						relevantIssues.push(issue);   
+
+		        	} else {
+		        		// console.log('issue not relevant: ', issue);
+		        	}
+		        
 		        });
 
-		        displayIssues(issues);
+		        displayIssues(relevantIssues);
 	      });      
 	  }
 
@@ -142,7 +266,10 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 	${it.maxEntries},
 	${it.deltaDaysForNewIssues},
 	${it.sonarNewIssuesPrioritiesJson},
-	${it.priorityValueByNameJson}
+	${it.priorityValueByNameJson},
+	${it.sonarAssigneeStatus},
+	${it.assigneeStatusValueByNameJson},
+	${it.isSonarShowAssigneeBar()}
 );
 
 ]]></script>

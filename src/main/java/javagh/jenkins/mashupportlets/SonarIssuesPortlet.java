@@ -27,6 +27,9 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
     private final int sonarPriorityThreshold;
     private final int sonarNewIssuesPriorityThreshold;
 
+    private final int sonarAssigneeStatus;
+    private final boolean sonarShowAssigneeBar;
+    
     private final int maxEntries;
     private final int deltaDaysForNewIssues;
 
@@ -37,7 +40,7 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
     @DataBoundConstructor
     public SonarIssuesPortlet(String name, String sonarBaseUrl,
-            String sonarProjectsList, int sonarPriorityThreshold,
+            String sonarProjectsList, int sonarPriorityThreshold, int sonarAssigneeStatus, boolean sonarShowAssigneeBar,
             int maxEntries, int sonarNewIssuesPriorityThreshold,
             int deltaDaysForNewIssues, int violationDescriptionMaximumLength, String sonarApiUser, String sonarApiPw) {
         super(name);
@@ -48,6 +51,9 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
         this.sonarPriorityThreshold = sonarPriorityThreshold;
 
+        this.sonarAssigneeStatus = sonarAssigneeStatus;
+        this.sonarShowAssigneeBar = sonarShowAssigneeBar;
+        
         this.maxEntries = maxEntries;
 
         this.sonarNewIssuesPriorityThreshold = sonarNewIssuesPriorityThreshold;
@@ -88,10 +94,17 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
     public int getDeltaDaysForNewIssues() {
         return deltaDaysForNewIssues > 0 ? deltaDaysForNewIssues : 5;
     }
-    
-    
 
-    public String getSonarApiUser() {
+    public int getSonarAssigneeStatus() {
+		return sonarAssigneeStatus;
+	}
+	
+	public boolean isSonarShowAssigneeBar() {
+		return sonarShowAssigneeBar;
+	}
+
+
+	public String getSonarApiUser() {
 		return sonarApiUser;
 	}
 
@@ -127,6 +140,11 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
     public String getPriorityValueByNameJson() {
         return SonarPriority.getPriorityValueByNameJson();
     }
+    public String getAssigneeStatusValueByNameJson() {
+        return SonarAssigneeStatus.getPriorityValueByNameJson();
+    }
+    
+    
 
 	@JavaScriptMethod
     public HttpResponse ajaxViaJenkins(String urlStr) {
@@ -153,6 +171,14 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
             ListBoxModel items = new ListBoxModel();
             items.add("Same as for default list", String.valueOf(DEFAULT_PRIO_NO));
             items.addAll(doFillSonarPriorityThresholdItems());
+            return items;
+        }
+        
+        public ListBoxModel doFillSonarAssigneeStatusItems() {
+            ListBoxModel items = new ListBoxModel();
+            for (SonarAssigneeStatus sonarAssigneeStatus : SonarAssigneeStatus.values()) {
+                items.add(sonarAssigneeStatus.name(), String.valueOf(sonarAssigneeStatus.ordinal()));
+            }
             return items;
         }
 
