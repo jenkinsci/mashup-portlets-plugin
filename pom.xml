@@ -9,7 +9,7 @@
 
 	<groupId>javagh.jenkins</groupId>
 	<artifactId>mashup-portlets-plugin</artifactId>
-	<version>0.9.2</version>
+	<version>0.9.3-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	
 	<name>Mashup Portlets</name>
