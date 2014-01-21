@@ -18,7 +18,7 @@ var rootUrl = '${rootURL}';
 
     Q(latestChangesDiv).load(rootUrl+"/job/"+jenkinsJobNameForUrl+"/changes #main-panel ol", function() {
          Q(latestChangesDiv+" a[href]").each(function() { 
-             if(this.href.indexOf('/user/') > -1 && !(this.href.indexOf('/user/jenkins/my-views/') > -1)) {
+             if(this.href.indexOf('/user/') > -1 && !(this.href.indexOf('/my-views/') > -1)) {
                  // leave normal user urls unchanged
              } else {
                  // correcting change set links    
