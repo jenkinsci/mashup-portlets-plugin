@@ -1,5 +1,5 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" 
-	    xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
+        xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
       xmlns:dp="/hudson/plugins/view/dashboard">
 
 <style>
@@ -15,261 +15,249 @@ td.sTableTop { vertical-align: top; }
 <script type="text/javascript"><![CDATA[
 
 new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, 
-	sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, 
-	prioValueByName, sonarAssigneeStatus, assigneeStatusValueByNameJson, sonarShowAssigneeBar) 
+    sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, 
+    prioValueByName, sonarAssigneeStatus, assigneeStatusValueByNameJson, sonarShowAssigneeBar) 
 {
 
-	  var divSelect = "#" + divId;
-	  var userNameLookupTable = {};
-	  var UNASSIGNED = "unassigned";
-	
-	  function getPrioHtmlImg(prio) {
-	      var imgHtml = '<img src="'+sonarBase+'/images/priority/'+prioValueByName[prio]+'.png" border="0" alt="'+prio+'"/>';
-	      return imgHtml;        
-	  }
+      var divSelect = "#" + divId;
+      var userNameLookupTable = {};
+      var UNASSIGNED = "unassigned";
+    
+      function getPrioHtmlImg(prio) {
+          var imgHtml = '<img src="'+sonarBase+'/images/priority/'+prioValueByName[prio]+'.png" border="0" alt="'+prio+'"/>';
+          return imgHtml;        
+      }
 
-	  function getUserNameForLogin(login) {
-	      var name = UNASSIGNED;
-	      if(login) {
-		      var name = userNameLookupTable[login];
-		      if(!name) {
-		          name = login;
-		      }
-	      }
-	      return name;	  		
-	  }
-	  
-	  function getUserNameWithLinkForLogin(login) {
-	      if(login) {
-		      var name = getUserNameForLogin(login);
-		      var link = sonarBase+'/issues/search?assignees='+login+'&sort=SEVERITY&asc=false';
-		      var linkHtml = '<a href="'+link+'" target="_blank">'+name+'</a>';
-		      return linkHtml;		      
-	      } else {
-	      	  return UNASSIGNED;
-	      }
-  		
-	  }
+      function getUserNameForLogin(login) {
+          var name = UNASSIGNED;
+          if(login) {
+              var name = userNameLookupTable[login];
+              if(!name) {
+                  name = login;
+              }
+          }
+          return name;              
+      }
+      
+      function getUserNameWithLinkForLogin(login) {
+          if(login) {
+              var componentRoots = sonarProjects.join(",");
+              var sonarSeverities = sonarPriorities.join(",");
+          
+              var name = getUserNameForLogin(login);
+              var link = sonarBase+'/issues/search#assignees='+login+'|resolved=false|sort=UPDATE_DATE|asc=false|componentRoots='+componentRoots+'|severities='+sonarSeverities;
+              var linkHtml = '<a href="'+link+'" target="_blank">'+name+'</a>';
+              return linkHtml;              
+          } else {
+              return UNASSIGNED;
+          }
+          
+      }
 
-	  function outputIssue(index, issue) {
-	  
-	     var message = issue.message;
-	     // remove long java package paths in message
-	     message = message.replace(/\b([a-z]+\.)+([A-Za-z0-9]+)/g, "$$2");
-	     
-	     var issueLinkParams = '?tab=violations&metric=info_violations&rule='+issue.severity; // key does not work anymore in 3.3.1 violation.rule.key; 
-	     var issueLink = sonarBase + '/resource/index/' + issue.component + issueLinkParams;  
-	            	      
-	     var assignedColumnHtml = '';
-	     if(!showOnlyUnassigned()) {
-	     	assignedColumnHtml = '<td class="sTableTop">' + getUserNameWithLinkForLogin(issue.assignee) + '</td>';
-	     }   
-	    	     
-	     var rowHtml = '<tr '+(issue.isNew?'bgcolor="#FFFF66"':'')+'><td>'+getPrioHtmlImg([issue.severity])
-	              +'</td><td class="sMessage" style="white-space:normal"><a href="'+issueLink+'" target="_blank">'+message+ 
-	              "</a><br/>in " + issue.component  +'</td>'
-	              + assignedColumnHtml
-	              +'<td class="sTableTop">' + issue.creationDate.toISOString().substring(0, 19).replace('T',' ') + '</td></tr>';       	          
-	            	          
-	     Q(divSelect+' table:last').append(rowHtml);	  
+      function outputIssue(index, issue) {
 
-	     if(index == maxEntries-1) {
-	     	return false;
-	     }
-	  }
-	  
-	  function outputIssuesTable(issues) {
-	      var colAssigneeHtml = '';	  	
-	      if(!showOnlyUnassigned()) {
-	      	colAssigneeHtml = '<th align="left" width="100">Assignee</th>';
-	      }
-	        	
-	      Q(divSelect).append('<table class="pane bigtable"><th align="left">Prio.</th><th align="left" width="850">Message</th>'+colAssigneeHtml+'<th align="left">Created</th></table>');
-	      Q.each(issues, outputIssue);
-	      if(issues.length>maxEntries) {
-	      	Q(divSelect).append( ('' + issues.length-maxEntries) + ' more validations in <a href="'+sonarBase+'" target="sonar">Sonar</a>');
-	      }
-	  }  
-	
-	  function issuesComparator(issueA, issueB) {
-	      var prioA = prioValueByName[issueA.severity]; 
-	      var prioB = prioValueByName[issueB.severity];
-	      if(prioA == prioB) {
-	      	return issueB.creationDate.getTime() - issueA.creationDate.getTime();
-	      } 
-	      return prioB - prioA;        
-	  }
-	
-	  function countPrio(allIssues, prioName) {
-	      var count = 0;
-	      Q.each(allIssues, function(index, issue) {
-	          if(issue.severity == prioName) count++;
-	      });
-	      return count;
-	  }
-	  
-	  function getSummary(allIssues) {
-	      var summary = '';
-	      Q.each(sonarPriorities, function(index, prio) {
-	          summary += getPrioHtmlImg(prio) + " " + prio + " " + countPrio(allIssues, prio) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	      });
-	      return summary;
-	  }  
-	
-	  function renderAssigneeBar(allIssues) {
-	      Q(divSelect).append("<strong>Busiest Assignees: </strong>");
-	      
-	      var issueCountObjByLogin = {};
-	      var issueCountObjArr = [];
-	      Q.each(allIssues, function(index, issue) {
-	         if(issue.assignee) {
-	         	if(!issueCountObjByLogin[issue.assignee]) {
-	         		var issueCountObj = { login: issue.assignee, issueCount: 1 };
-	         		issueCountObjByLogin[issue.assignee] = issueCountObj;
-	         		issueCountObjArr.push(issueCountObj);
-	         	} else {
-	         		issueCountObjByLogin[issue.assignee].issueCount = issueCountObjByLogin[issue.assignee].issueCount + 1;	         		 
-	         	}
-	         }
-	      });
-	      
-	      issueCountObjArr.sort(function(countObjA, countObjB) { return countObjB.issueCount - countObjA.issueCount;  });
-	      
+         var component = issue.component;
+         // add break opportunities for long java package paths in component string
+         component = component.replace(/([:./])/g, "<wbr/>$$1");    
+         
+         var issueLink = sonarBase + '/issue/show/' + issue.key;  
+                          
+         var assignedColumnHtml = '';
+         if(!showOnlyUnassigned()) {
+             assignedColumnHtml = '<td class="sTableTop">' + getUserNameWithLinkForLogin(issue.assignee) + '</td>';
+         }   
+                 
+         var rowHtml = '<tr '+(issue.isNew?'bgcolor="#FFFF66"':'')+'><td>'+getPrioHtmlImg([issue.severity])
+                  +'</td><td class="sMessage" style="white-space:normal"><a href="'+issueLink+'" target="_blank">'+issue.message+ 
+                  "</a><br/>in " + component  +'</td>'
+                  + assignedColumnHtml
+                  +'<td class="sTableTop">' + issue.creationDate.toISOString().substring(0, 19).replace('T',' ') + '</td></tr>';                     
+                              
+         Q(divSelect+' table:last').append(rowHtml);      
 
-	      
-	      Q.each(issueCountObjArr, function(index, issueCountObj) {
-	      	Q(divSelect).append( (index>0 ?', ':'') + getUserNameWithLinkForLogin(issueCountObj.login) + ' ('+issueCountObj.issueCount+')');
-	      	if((index+1) >= 5) {
-	      	   return false;
-	      	}
-	      });
-	      
-	      if(issueCountObjArr.length == 0) {
-	      	Q(divSelect).append('<i>no assignees found</i>');
-	      }
-	      
-	      Q(divSelect).append('<br /><br />');
-	  }  	
-	
-	  function displayIssues(allIssues) {
-	  
-	      Q(divSelect).html("");
-	      
-	      if(sonarShowAssigneeBar && !showOnlyUnassigned()) {
-	      	  renderAssigneeBar(allIssues);
-	      }
-	      
-	      Q(divSelect).append(getSummary(allIssues));
-	      
-	      allIssues.sort(issuesComparator);
-	      var newIssues = [];
-	      var oldIssues = [];
-	      
-	      Q.each(allIssues, function(index, issue) {
-	          if(issue.isNew) {
-	          	newIssues.push(issue);
-	          } else {
-	          	oldIssues.push(issue);
-	          }
-	      });
-	      
-	      if(newIssues.length > 0) {
-	      	Q(divSelect).append('<h2>New Issues</h2>');
-	      	outputIssuesTable(newIssues);
-	      }
-	      Q(divSelect).append('<h2>Issues</h2>');
-	      outputIssuesTable(oldIssues);
-	  }
+         if(index == maxEntries-1) {
+             return false;
+         }
+      }
+      
+      function outputIssuesTable(issues) {
+          var colAssigneeHtml = '';          
+          if(!showOnlyUnassigned()) {
+              colAssigneeHtml = '<th align="left" width="100">Assignee</th>';
+          }
+                
+          Q(divSelect).append('<table class="pane bigtable"><th align="left">Prio.</th><th align="left" width="850">Message</th>'+colAssigneeHtml+'<th align="left">Created</th></table>');
+          Q.each(issues, outputIssue);
+          if(issues.length>maxEntries) {
+              Q(divSelect).append( ('' + issues.length-maxEntries) + ' more validations in <a href="'+sonarBase+'" target="sonar">Sonar</a>');
+          }
+      }  
+    
+      function issuesComparator(issueA, issueB) {
+          var prioA = prioValueByName[issueA.severity]; 
+          var prioB = prioValueByName[issueB.severity];
+          if(prioA == prioB) {
+              return issueB.creationDate.getTime() - issueA.creationDate.getTime();
+          } 
+          return prioB - prioA;        
+      }
+    
+      function countPrio(allIssues, prioName) {
+          var count = 0;
+          Q.each(allIssues, function(index, issue) {
+              if(issue.severity == prioName) count++;
+          });
+          return count;
+      }
+      
+      function getSummary(allIssues) {
+          var summary = '';
+          Q.each(sonarPriorities, function(index, prio) {
+              summary += getPrioHtmlImg(prio) + " " + prio + " " + countPrio(allIssues, prio) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+          });
+          return summary;
+      }  
+    
+      function renderAssigneeBar(allIssues) {
+          Q(divSelect).append("<strong>Busiest Assignees: </strong>");
+          
+          var issueCountObjByLogin = {};
+          var issueCountObjArr = [];
+          Q.each(allIssues, function(index, issue) {
+             if(issue.assignee) {
+                 if(!issueCountObjByLogin[issue.assignee]) {
+                     var issueCountObj = { login: issue.assignee, issueCount: 1 };
+                     issueCountObjByLogin[issue.assignee] = issueCountObj;
+                     issueCountObjArr.push(issueCountObj);
+                 } else {
+                     issueCountObjByLogin[issue.assignee].issueCount = issueCountObjByLogin[issue.assignee].issueCount + 1;                      
+                 }
+             }
+          });
+          
+          issueCountObjArr.sort(function(countObjA, countObjB) { return countObjB.issueCount - countObjA.issueCount;  });
+          
+          Q.each(issueCountObjArr, function(index, issueCountObj) {
+              Q(divSelect).append( (index>0 ?', ':'') + getUserNameWithLinkForLogin(issueCountObj.login) + ' ('+issueCountObj.issueCount+')');
+              if((index+1) >= 5) {
+                 return false;
+              }
+          });
+          
+          if(issueCountObjArr.length == 0) {
+              Q(divSelect).append('<i>no assignees found</i>');
+          }
+          
+          Q(divSelect).append('<br /><br />');
+      }      
+    
+      function displayIssues(allIssues) {
+      
+          Q(divSelect).html("");
+          
+          if(sonarShowAssigneeBar && !showOnlyUnassigned()) {
+                renderAssigneeBar(allIssues);
+          }
+          
+          Q(divSelect).append(getSummary(allIssues));
+          
+          allIssues.sort(issuesComparator);
+          var newIssues = [];
+          var oldIssues = [];
+          
+          Q.each(allIssues, function(index, issue) {
+              if(issue.isNew) {
+                  newIssues.push(issue);
+              } else {
+                  oldIssues.push(issue);
+              }
+          });
+          
+          if(newIssues.length > 0) {
+              Q(divSelect).append('<h2>New Issues</h2>');
+              outputIssuesTable(newIssues);
+          }
+          Q(divSelect).append('<h2>Issues</h2>');
+          outputIssuesTable(oldIssues);
+      }
 
-	  function showOnlyUnassigned() {
-	       return assigneeStatusValueByNameJson['UNASSIGNED'] == sonarAssigneeStatus;
-	  }	
+      function showOnlyUnassigned() {
+           return assigneeStatusValueByNameJson['UNASSIGNED'] == sonarAssigneeStatus;
+      }    
 
-	  function showOnlyAssigned() {
-	       return assigneeStatusValueByNameJson['ASSIGNED'] == sonarAssigneeStatus;
-	  }		  
+      function showOnlyAssigned() {
+           return assigneeStatusValueByNameJson['ASSIGNED'] == sonarAssigneeStatus;
+      }          
+    
+      function populateUserNameLookupTable(users) {
+            // console.log('users: ', users);
+            Q.each(users, function(index, user) { 
+                userNameLookupTable[user.login] = user.name;
+            });    
+      }    
 
-	  function isRelevant(issue) {
-        	var isAssigned = false;
-        	if(issue.assignee) {
-        		isAssigned = true;
-        	}
-        	var isRelevant = true;
-        	if(showOnlyUnassigned()) {
-        		isRelevant = !isAssigned;
-        	} else if(showOnlyAssigned()) {
-        		isRelevant = isAssigned;
-        	}	  
-	  		return isRelevant;
-	  }
-	
-	  function populateUserNameLookupTable(users) {
-	        Q.each(users, function(index, user) { 
-	        	userNameLookupTable[user.login] = user.name;
-	        });	
-	  }	
+    
+      function loadIssues() {
+      
+          Q(divSelect).append("<br/><br/>Projects:<br/>" + sonarProjects.join('<br/>')+"<br/>");      
+      
+          var componentRoots = sonarProjects.join(",");
+          var sonarSeverities = sonarPriorities.join(",");
+          var projectIssuesUrl = sonarBase + "/api/issues/search?format=json&pageSize=-1&severities="+sonarSeverities+"&componentRoots=" + componentRoots;
+          
+          if(showOnlyAssigned()) {
+              projectIssuesUrl += "&assigned=true";
+          } else if(showOnlyUnassigned()) {
+              projectIssuesUrl += "&assigned=false";
+          }
+          
+          // console.log('projectIssuesUrl: ', projectIssuesUrl);
+          ajaxViaJenkins(projectIssuesUrl,  function(resp) {
+                var text = resp.responseText;
+                
+                if(text.substring(0,5) == 'ERROR') {
+                     Q('#'+loaderSpanId).html(text);
+                     return;
+                }        
+                var responseObject = resp.responseObject();
 
-	
-	  function loadIssues() {
-	  
-	      Q(divSelect).append("<br/><br/>Projects:<br/>" + sonarProjects.join('<br/>')+"<br/>");	  
-	  
-	      var componentRoots = sonarProjects.join(",");
-	      var sonarSeverities = sonarPriorities.join(",");
-	      var projectIssuesUrl = sonarBase + "/api/issues/search?format=json&pageSize=-1&severities="+sonarSeverities+"&componentRoots=" + componentRoots;
-	      // console.log('projectIssuesUrl: ', projectIssuesUrl);
-	      ajaxViaJenkins(projectIssuesUrl,  function(resp) {
-		        var text = resp.responseText;
-		        
-		        if(text.substring(0,5) == 'ERROR') {
-		             Q('#'+loaderSpanId).html(text);
-		             return;
-		        }        
-		        var responseObject = resp.responseObject();
+                populateUserNameLookupTable(responseObject.users);
+                
+                // console.log('issues in response: ', responseObject.issues);
+                
+                var issueList = [];
+                
+                var today = new Date();
+                Q.each(responseObject.issues, function(index, issue) { 
 
-				populateUserNameLookupTable(responseObject.users);
-		        
-		        // console.log('issues in response: ', responseObject.issues);
-		        
-		        var relevantIssues = [];
-		        
-		        var today = new Date();
-		        Q.each(responseObject.issues, function(index, issue) { 
+                    issue.creationDate = new Date(issue.creationDate);         
+                    var difference = today.getTime() - issue.creationDate.getTime();
+                    var daysDiff = Math.round(difference/(1000*60*60*24));
+                    issue.isNew = ((daysDiff <= deltaDaysForNewIssues) && Q.inArray(issue.severity, sonarNewIssuesPriorities)>-1);   
+                    
+                    issueList.push(issue);   
+                });
 
-		        	if(isRelevant(issue)) {
-						issue.creationDate = new Date(issue.creationDate);         
-						var difference = today.getTime() - issue.creationDate.getTime();
-						var daysDiff = Math.round(difference/(1000*60*60*24));
-						issue.isNew = ((daysDiff <= deltaDaysForNewIssues) && Q.inArray(issue.severity, sonarNewIssuesPriorities)>-1);   
-						
-						relevantIssues.push(issue);   
+                displayIssues(issueList);
+          });      
+      }
 
-		        	} else {
-		        		// console.log('issue not relevant: ', issue);
-		        	}
-		        
-		        });
-
-		        displayIssues(relevantIssues);
-	      });      
-	  }
-
-	  Q(document).ready(loadIssues);
+      Q(document).ready(loadIssues);
 
 }('${it.divId}', 
-	'${rootURL}', 
-	mashupPlugin_${it.id}.ajaxViaJenkins,
-	'${it.sonarBaseUrl}',
-	${it.sonarProjectsJson},
-	${it.sonarPrioritiesJson},
-	${it.sonarPriorityThreshold},
-	${it.maxEntries},
-	${it.deltaDaysForNewIssues},
-	${it.sonarNewIssuesPrioritiesJson},
-	${it.priorityValueByNameJson},
-	${it.sonarAssigneeStatus},
-	${it.assigneeStatusValueByNameJson},
-	${it.isSonarShowAssigneeBar()}
+    '${rootURL}', 
+    mashupPlugin_${it.id}.ajaxViaJenkins,
+    '${it.sonarBaseUrl}',
+    ${it.sonarProjectsJson},
+    ${it.sonarPrioritiesJson},
+    ${it.sonarPriorityThreshold},
+    ${it.maxEntries},
+    ${it.deltaDaysForNewIssues},
+    ${it.sonarNewIssuesPrioritiesJson},
+    ${it.priorityValueByNameJson},
+    ${it.sonarAssigneeStatus},
+    ${it.assigneeStatusValueByNameJson},
+    ${it.isSonarShowAssigneeBar()}
 );
 
 ]]></script>
