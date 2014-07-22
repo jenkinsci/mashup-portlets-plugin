@@ -203,7 +203,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
       
           var componentRoots = sonarProjects.join(",");
           var sonarSeverities = sonarPriorities.join(",");
-          var projectIssuesUrl = sonarBase + "/api/issues/search?format=json&pageSize=-1&severities="+sonarSeverities+"&componentRoots=" + componentRoots;
+          var projectIssuesUrl = sonarBase + "/api/issues/search?format=json&pageSize=-1&resolved=false&severities="+sonarSeverities+"&componentRoots=" + componentRoots;
           
           if(showOnlyAssigned()) {
               projectIssuesUrl += "&assigned=true";
