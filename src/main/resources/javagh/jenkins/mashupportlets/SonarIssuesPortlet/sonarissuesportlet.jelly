@@ -16,7 +16,7 @@ td.sTableTop { vertical-align: top; }
 
 new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, 
     sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, 
-    prioValueByName, sonarAssigneeStatus, assigneeStatusValueByNameJson, sonarShowAssigneeBar) 
+    prioValueByName, sonarAssigneeStatus, assigneeStatusValueByNameJson, sonarShowAssigneeBar, labelAssigneesRanking) 
 {
 
       var divSelect = "#" + divId;
@@ -121,7 +121,11 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
       }  
     
       function renderAssigneeBar(allIssues) {
-          Q(divSelect).append("<strong>Busiest Assignees: </strong>");
+      
+          if(!labelAssigneesRanking) {
+              labelAssigneesRanking = "Busiest Assignees: ";
+          }
+          Q(divSelect).append("<strong>"+labelAssigneesRanking+"</strong> ");
           
           var issueCountObjByLogin = {};
           var issueCountObjArr = [];
@@ -259,7 +263,8 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
     ${it.priorityValueByNameJson},
     ${it.sonarAssigneeStatus},
     ${it.assigneeStatusValueByNameJson},
-    ${it.isSonarShowAssigneeBar()}
+    ${it.isSonarShowAssigneeBar()},
+    '${it.labelAssigneesRanking}'
 );
 
 ]]></script>

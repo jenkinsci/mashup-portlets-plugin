@@ -12,7 +12,7 @@ import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 /**
- * Shows SonarQube (Sonar >=3.6) issues in a portlet.
+ * Shows SonarQube issues in a portlet.
  * 
  * @author G.Henzler
  *
@@ -29,6 +29,8 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
     private final int sonarAssigneeStatus;
     private final boolean sonarShowAssigneeBar;
+    private final String labelAssigneesRanking;
+    
     
     private final int maxEntries;
     private final int deltaDaysForNewIssues;
@@ -42,7 +44,7 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
     public SonarIssuesPortlet(String name, String sonarBaseUrl,
             String sonarProjectsList, int sonarPriorityThreshold, int sonarAssigneeStatus, boolean sonarShowAssigneeBar,
             int maxEntries, int sonarNewIssuesPriorityThreshold,
-            int deltaDaysForNewIssues, int violationDescriptionMaximumLength, String sonarApiUser, String sonarApiPw) {
+            int deltaDaysForNewIssues, int violationDescriptionMaximumLength, String sonarApiUser, String sonarApiPw, String labelAssigneesRanking) {
         super(name);
         
         this.sonarBaseUrl = Utils.normalizeBaseUrl(sonarBaseUrl);   
@@ -53,6 +55,7 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
         this.sonarAssigneeStatus = sonarAssigneeStatus;
         this.sonarShowAssigneeBar = sonarShowAssigneeBar;
+        this.labelAssigneesRanking = labelAssigneesRanking;
         
         this.maxEntries = maxEntries;
 
@@ -101,6 +104,10 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 	
 	public boolean isSonarShowAssigneeBar() {
 		return sonarShowAssigneeBar;
+	}
+
+	public String getLabelAssigneesRanking() {
+		return labelAssigneesRanking;
 	}
 
 

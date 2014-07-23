@@ -21,6 +21,13 @@
   </f:entry>   
 
   <f:advanced>
+	  <f:entry title="${%SonarApiUser}" field="sonarApiUser">
+	    <f:textbox />
+	  </f:entry> 	
+	  <f:entry title="${%SonarApiPw}" field="sonarApiPw">
+	    <f:password />
+	  </f:entry> 
+	  
 	  <f:entry title="${%MaxEntries}" field="maxEntries">
 	    <f:textbox />
 	  </f:entry>
@@ -30,13 +37,11 @@
 	  <f:entry title="${%DeltaDaysForNewIssues}" field="deltaDaysForNewIssues">
 	    <f:textbox />
 	  </f:entry>  	
-	  <f:entry title="${%SonarApiUser}" field="sonarApiUser">
+		    
+	  <f:entry title="${%LabelAssigneesRanking}" field="labelAssigneesRanking">
 	    <f:textbox />
 	  </f:entry> 	
-	  <f:entry title="${%SonarApiPw}" field="sonarApiPw">
-	    <f:password />
-	  </f:entry> 		    
-	  
+	  	  
   </f:advanced>
  
   
