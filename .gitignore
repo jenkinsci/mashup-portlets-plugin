@@ -3,3 +3,5 @@
 /.classpath
 /.settings
 /work
+.DS_Store
+release.sh
