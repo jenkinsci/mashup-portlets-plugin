@@ -47,7 +47,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
               var name = getUserNameForLogin(login);
               var search = 'assignees='+login+'|resolved=false|sort=UPDATE_DATE|asc=false|componentRoots='+componentRoots+'|severities='+sonarSeverities;
               // Using query params AND anchor (to work with sonar 4.1-4.3)
-              var link = sonarBase+'/issues/search?'+search.replace('|','&')+'#'+search;
+              var link = sonarBase+'/issues/search?'+search.replace(/\|/g,'&')+'#'+search;
               var linkHtml = '<a href="'+link+'" target="_blank">'+name+'</a>';
               return linkHtml;              
           } else {
