@@ -16,7 +16,8 @@ td.sTableTop { vertical-align: top; }
 
 new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, 
     sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, 
-    prioValueByName, sonarAssigneeStatus, assigneeStatusValueByNameJson, sonarShowAssigneeBar, labelAssigneesRanking) 
+    prioValueByName, sonarAssigneeStatus, assigneeStatusValueByNameJson, sonarShowAssigneeBar, 
+    labelAssigneesRanking, maxAssigneesInRanking) 
 {
 
       var divSelect = "#" + divId;
@@ -73,7 +74,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
                   +'</td><td class="sMessage" style="white-space:normal"><a href="'+issueLink+'" target="_blank">'+issue.message+ 
                   "</a><br/>in " + component  +'</td>'
                   + assignedColumnHtml
-                  +'<td class="sTableTop">' + issue.creationDate.toISOString().substring(0, 19).replace('T',' ') + '</td></tr>';                     
+                  +'<td class="sTableTop">' + issue.creationDate.toISOString().substring(0, 19).replace('T',' <wbr/>') + '</td></tr>';                     
                               
          Q(divSelect+' table:last').append(rowHtml);      
 
@@ -144,8 +145,8 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
           issueCountObjArr.sort(function(countObjA, countObjB) { return countObjB.issueCount - countObjA.issueCount;  });
           
           Q.each(issueCountObjArr, function(index, issueCountObj) {
-              Q(divSelect).append( (index>0 ?', ':'') + getUserNameWithLinkForLogin(issueCountObj.login) + ' ('+issueCountObj.issueCount+')');
-              if((index+1) >= 5) {
+              Q(divSelect).append((index>0 ?', ':'') + '<wbr/>' + getUserNameWithLinkForLogin(issueCountObj.login) + ' ('+issueCountObj.issueCount+')');
+              if((index+1) >= maxAssigneesInRanking) {
                  return false;
               }
           });
@@ -222,7 +223,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
                 var text = resp.responseText;
                 
                 if(text.substring(0,5) == 'ERROR') {
-                     Q('#'+loaderSpanId).html(text);
+                     Q(divSelect).html(text);
                      return;
                 }        
                 var responseObject = resp.responseObject();
@@ -264,7 +265,8 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
     ${it.sonarAssigneeStatus},
     ${it.assigneeStatusValueByNameJson},
     ${it.isSonarShowAssigneeBar()},
-    '${it.labelAssigneesRanking}'
+    '${it.labelAssigneesRanking}',
+    ${it.maxAssigneesInRanking}
 );
 
 ]]></script>

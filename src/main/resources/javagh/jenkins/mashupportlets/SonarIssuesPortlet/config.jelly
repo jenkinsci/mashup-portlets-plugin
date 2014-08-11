@@ -41,6 +41,10 @@
 	  <f:entry title="${%LabelAssigneesRanking}" field="labelAssigneesRanking">
 	    <f:textbox />
 	  </f:entry> 	
+
+	  <f:entry title="${%MaxAssigneesInRanking}" field="maxAssigneesInRanking">
+	    <f:textbox />
+	  </f:entry> 	  	  	  	  
 	  	  
   </f:advanced>
  

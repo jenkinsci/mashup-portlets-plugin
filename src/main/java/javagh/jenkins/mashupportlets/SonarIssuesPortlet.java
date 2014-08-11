@@ -30,7 +30,7 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
     private final int sonarAssigneeStatus;
     private final boolean sonarShowAssigneeBar;
     private final String labelAssigneesRanking;
-    
+    private final int maxAssigneesInRanking;
     
     private final int maxEntries;
     private final int deltaDaysForNewIssues;
@@ -44,7 +44,8 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
     public SonarIssuesPortlet(String name, String sonarBaseUrl,
             String sonarProjectsList, int sonarPriorityThreshold, int sonarAssigneeStatus, boolean sonarShowAssigneeBar,
             int maxEntries, int sonarNewIssuesPriorityThreshold,
-            int deltaDaysForNewIssues, int violationDescriptionMaximumLength, String sonarApiUser, String sonarApiPw, String labelAssigneesRanking) {
+            int deltaDaysForNewIssues, int violationDescriptionMaximumLength, String sonarApiUser, 
+            String sonarApiPw, String labelAssigneesRanking, int maxAssigneesInRanking) {
         super(name);
         
         this.sonarBaseUrl = Utils.normalizeBaseUrl(sonarBaseUrl);   
@@ -56,6 +57,7 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
         this.sonarAssigneeStatus = sonarAssigneeStatus;
         this.sonarShowAssigneeBar = sonarShowAssigneeBar;
         this.labelAssigneesRanking = labelAssigneesRanking;
+        this.maxAssigneesInRanking = maxAssigneesInRanking;
         
         this.maxEntries = maxEntries;
 
@@ -84,6 +86,10 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
     public int getMaxEntries() {
         return maxEntries > 0 ? maxEntries : 50;
+    }
+    
+    public int getMaxAssigneesInRanking() {
+        return maxAssigneesInRanking > 0 ? maxAssigneesInRanking : 5;
     }
 
     public int getSonarPriorityThreshold() {
