@@ -59,9 +59,11 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 
       function outputIssue(index, issue) {
 
+         var message = issue.message;
          var component = issue.component;
-         // add break opportunities for long java package paths in component string
-         component = component.replace(/([:./])/g, "<wbr/>$$1");    
+         // add break opportunities for long java package paths in message/component string
+         message = message.replace(/([:./])/g, "<wbr/>$$1");      
+         component = component.replace(/([:./])/g, "<wbr/>$$1");  
          
          var issueLink = sonarBase + '/issue/show/' + issue.key;  
                           
@@ -71,7 +73,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
          }   
                  
          var rowHtml = '<tr '+(issue.isNew?'bgcolor="#FFFF66"':'')+'><td>'+getPrioHtmlImg([issue.severity])
-                  +'</td><td class="sMessage" style="white-space:normal"><a href="'+issueLink+'" target="_blank">'+issue.message+ 
+                  +'</td><td class="sMessage" style="white-space:normal"><a href="'+issueLink+'" target="_blank">'+message+ 
                   "</a><br/>in " + component  +'</td>'
                   + assignedColumnHtml
                   +'<td class="sTableTop">' + issue.creationDate.toISOString().substring(0, 19).replace('T',' <wbr/>') + '</td></tr>';                     
