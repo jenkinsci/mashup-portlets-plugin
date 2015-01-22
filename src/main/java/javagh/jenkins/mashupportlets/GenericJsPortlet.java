@@ -34,11 +34,16 @@ public class GenericJsPortlet extends AbstractMashupPortlet {
 	public String getContainerDivId() {
 		return containerDivId;
 	}
-
+	
+	@JavaScriptMethod
+    public HttpResponse ajaxViaJenkins(String urlStr) {
+		return new ServerSideHttpCall(urlStr, null, null);
+    }
+	
 	@JavaScriptMethod
     public HttpResponse ajaxViaJenkins(String urlStr, String user, String pw) {
 		return new ServerSideHttpCall(urlStr, user, pw);
-    }
+    }	
 
 	@Extension
 	public static class GenericJsPortletDescriptor extends Descriptor<DashboardPortlet> {
