@@ -9,13 +9,21 @@
 
 <script type="text/javascript">
 
-new function(divId, rootUrl, ajaxViaJenkins) {
+new function(divId, rootUrl, ajaxViaJenkinsWithoutAuth, ajaxViaJenkinsWithAuth) {
+    var ajaxViaJenkins = function() {
+        if(typeof arguments[1] === 'string') {
+            ajaxViaJenkinsWithAuth.apply(null, arguments);
+        } else {
+            ajaxViaJenkinsWithoutAuth.apply(null, arguments);
+        }
+    }
+
 /// GENERIC JS CONTENT STARTS HERE
 
 	${it.javascript}
 	
 /// GENERIC JS CONTENT ENDS HERE	
-}("${it.containerDivId}", "${rootURL}", mashupPlugin_${it.id}.ajaxViaJenkins);
+}("${it.containerDivId}", "${rootURL}", mashupPlugin_${it.id}.ajaxViaJenkinsWithoutAuth, mashupPlugin_${it.id}.ajaxViaJenkinsWithAuth);
 
 </script>
 
