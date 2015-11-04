@@ -1,4 +1,4 @@
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" 
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler"
 	    xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
       xmlns:dp="/hudson/plugins/view/dashboard">
 
@@ -13,26 +13,32 @@ var jiraUrl = '${it.jiraUrl}';
 var latestChangesDiv = '#latestChangesDiv_${it.id}';
 var jenkinsJobNameForUrl = '${it.jenkinsJobNameForUrl}';
 var rootUrl = '${rootURL}';
+var numChanges = parseInt('${it.numChanges}');
 
 <![CDATA[
 
     Q(latestChangesDiv).load(rootUrl+"/job/"+jenkinsJobNameForUrl+"/changes #main-panel ol", function() {
-         Q(latestChangesDiv+" a[href]").each(function() { 
+				Q(latestChangesDiv + ' > ol').each(function (i, el) {
+						if (i >= numChanges) {
+							Q(el).remove();
+						}
+				});
+         Q(latestChangesDiv+" a[href]").each(function() {
              if(this.href.indexOf('/user/') > -1 && !(this.href.indexOf('/my-views/') > -1)) {
                  // leave normal user urls unchanged
              } else {
-                 // correcting change set links    
+                 // correcting change set links
                  //console.log("this.href before replace = ", this.href);
                  var replacement = rootUrl + "/job/"+jenkinsJobNameForUrl+"/$$1";
                  //console.log("replacement = ", replacement);
                  this.href = this.href.replace(/.*\/([0-9]+\/)/, replacement);
                  //console.log("this.href after  replace = ", this.href);
-             } 
+             }
          });
 
 		if(jiraUrl) {
 			 // console.log("jiraUrl=", jiraUrl);
-			 Q(latestChangesDiv+" li").each(function() { 
+			 Q(latestChangesDiv+" li").each(function() {
 					var htmlOfItem = Q(this).html();
 					// console.log("htmlOfItem=", htmlOfItem);
 					var htmlWithJiraLink = htmlOfItem.replace(/([A-Z]{3,}-[0-9]+)/, "<a target=\"_blank\" href=\"" + jiraUrl + "/$$1\">$$1</a>");
@@ -40,13 +46,13 @@ var rootUrl = '${rootURL}';
 					Q(this).html(htmlWithJiraLink);
 
 	         });
-			 
+
 		}
- 
+
      });
-});  
-	
-		
+});
+
+
 ]]></script>
 
 
