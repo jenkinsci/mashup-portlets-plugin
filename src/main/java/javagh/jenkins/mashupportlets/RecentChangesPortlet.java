@@ -15,12 +15,12 @@ import org.kohsuke.stapler.DataBoundConstructor;
 public class RecentChangesPortlet extends AbstractMashupPortlet {
 
 	private String jenkinsJobName;
-	private int numChanges;
+	private String numChanges;
 	private String jiraUrl;
 
 
 	@DataBoundConstructor
-	public RecentChangesPortlet(String name, String jenkinsJobName, int numChanges, String jiraUrl) {
+	public RecentChangesPortlet(String name, String jenkinsJobName, String numChanges, String jiraUrl) {
 		super(name);
 		this.jenkinsJobName = jenkinsJobName;
 		this.numChanges = numChanges;
@@ -35,7 +35,7 @@ public class RecentChangesPortlet extends AbstractMashupPortlet {
 		return jenkinsJobName==null?"":jenkinsJobName.replace(" ", "%20");
 	}
 
-	public int getNumChanges() {
+	public String getNumChanges() {
 		return numChanges;
 	}
 

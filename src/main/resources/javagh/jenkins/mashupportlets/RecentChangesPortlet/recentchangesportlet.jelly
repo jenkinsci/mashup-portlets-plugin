@@ -13,16 +13,16 @@ var jiraUrl = '${it.jiraUrl}';
 var latestChangesDiv = '#latestChangesDiv_${it.id}';
 var jenkinsJobNameForUrl = '${it.jenkinsJobNameForUrl}';
 var rootUrl = '${rootURL}';
-var numChanges = parseInt('${it.numChanges}');
+var numChanges = parseInt('${it.numChanges}') || 20;
 
 <![CDATA[
 
     Q(latestChangesDiv).load(rootUrl+"/job/"+jenkinsJobNameForUrl+"/changes #main-panel ol", function() {
-				Q(latestChangesDiv + ' > ol').each(function (i, el) {
-						if (i >= numChanges) {
-							Q(el).remove();
-						}
-				});
+         Q(latestChangesDiv + ' > ol').each(function (i, el) {
+             if (i >= numChanges) {
+                 Q(el).remove();
+             }
+         });
          Q(latestChangesDiv+" a[href]").each(function() {
              if(this.href.indexOf('/user/') > -1 && !(this.href.indexOf('/my-views/') > -1)) {
                  // leave normal user urls unchanged
