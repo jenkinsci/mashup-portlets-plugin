@@ -5,6 +5,9 @@
   <f:entry title="${%JobName}" field="jenkinsJobName">
     <f:textbox />
   </f:entry>
+  <f:entry title="${%NumChanges}" field="numChanges">
+    <f:textbox default="10"/>
+  </f:entry>
   <f:entry title="${%Jira}" field="jiraUrl">
     <f:textbox />
   </f:entry>
