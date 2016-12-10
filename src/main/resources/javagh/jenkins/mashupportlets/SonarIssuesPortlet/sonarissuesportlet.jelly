@@ -26,6 +26,8 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
       
       var userNameLookupTable = {};
       var UNASSIGNED = "unassigned";
+      
+      var isSonar4 = false;
     
       function getPrioHtmlImg(prio) {
           var imgHtml = '<img src="'+sonarBase+'/images/priority/'+prioValueByName[prio]+'.png" border="0" alt="'+prio+'"/>';
@@ -68,7 +70,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
          message = message.replace(/([:./])/g, "<wbr/>$$1");      
          component = component.replace(/([:./])/g, "<wbr/>$$1");  
          
-         var issueLink = sonarBase + '/issue/show/' + issue.key;  
+         var issueLink = isSonar4 ? sonarBase + '/issue/show/' + issue.key : sonarBase + '/issues/search#issues=' + issue.key;  
                           
          var assignedColumnHtml = '';
          if(!showOnlyUnassigned()) {
@@ -202,7 +204,9 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
       }          
     
       function populateUserNameLookupTable(users) {
-            // console.log('users: ', users);
+            if(!users) {
+            	return;
+            }      
             Q.each(users, function(index, user) { 
                 userNameLookupTable[user.login] = user.name;
             });    
@@ -215,7 +219,8 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
       
           var componentRoots = sonarProjects.join(",");
           var sonarSeverities = sonarPriorities.join(",");
-          var projectIssuesUrl = sonarBase + "/api/issues/search?format=json&pageSize=-1&resolved=false&severities="+sonarSeverities+"&componentRoots=" + componentRoots;
+          // adding param additionalFields for Sonar 5.x
+          var projectIssuesUrl = sonarBase + "/api/issues/search?format=json&additionalFields=users,languages&pageSize=-1&resolved=false&severities="+sonarSeverities+"&componentRoots=" + componentRoots;
           
           if(showOnlyAssigned()) {
               projectIssuesUrl += "&assigned=true";
@@ -232,6 +237,11 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
                      return;
                 }        
                 var responseObject = resp.responseObject();
+                
+                if(!responseObject.languages) {
+                    // if languages is not a property although explicitly requested via additionalFields => sonar 4
+                    isSonar4 = true;
+                }
 
                 populateUserNameLookupTable(responseObject.users);
                 
