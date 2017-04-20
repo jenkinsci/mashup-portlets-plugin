@@ -48,7 +48,8 @@ public class ServerSideHttpCall implements HttpResponse {
         try {
             URL url = new URL(urlStr);
             urlCon = (HttpURLConnection) url.openConnection();
-
+            urlCon.setConnectTimeout(30000); 
+            urlCon.setReadTimeout(30000);
 
             if(StringUtils.isNotBlank(httpBasicAuthUser) && StringUtils.isNotBlank(httpBasicAuthPw)) {
             	final String strEncoding = "UTF-8";
