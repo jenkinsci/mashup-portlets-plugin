@@ -51,7 +51,7 @@ public class ServerSideHttpCall implements HttpResponse {
             urlCon.setConnectTimeout(30000); 
             urlCon.setReadTimeout(30000);
 
-            if(StringUtils.isNotBlank(httpBasicAuthUser) && StringUtils.isNotBlank(httpBasicAuthPw)) {
+            if(StringUtils.isNotBlank(httpBasicAuthUser)) {
             	final String strEncoding = "UTF-8";
                 String encoded = new String(Base64.encodeBase64((httpBasicAuthUser+":"+httpBasicAuthPw).getBytes(strEncoding)), strEncoding); 
                 urlCon.setRequestProperty("Authorization", "Basic "+encoded); 
