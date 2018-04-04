@@ -9,6 +9,4 @@ Additional portlets for jenkins Dashboards (see https://wiki.jenkins-ci.org/disp
 - Recent Changes Portlet: Will show the recent SCM changes of a configured project
 - SonarQube Issues Portlet: Shows issues for the given projects (projects and severity can be configured)
 
-NOTE: The SonarQube portlets will be moved to https://wiki.jenkins-ci.org/display/JENKINS/SonarQube+plugin soon.
-
 See help sections in portlet configuration for more information.
