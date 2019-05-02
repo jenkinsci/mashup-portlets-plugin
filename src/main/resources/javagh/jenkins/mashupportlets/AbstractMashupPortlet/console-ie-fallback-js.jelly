@@ -1,3 +1,4 @@
+<?jelly escape-by-default='true'?>
 <script type="text/javascript"><![CDATA[
 if(typeof console === "undefined" || typeof console.log === "undefined") {
      console = {}; console.log = function() {};
