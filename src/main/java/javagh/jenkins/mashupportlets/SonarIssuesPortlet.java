@@ -1,15 +1,16 @@
 package javagh.jenkins.mashupportlets;
 
-import hudson.Extension;
-import hudson.model.Descriptor;
-import hudson.plugins.view.dashboard.DashboardPortlet;
-import hudson.util.ListBoxModel;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
+
+import hudson.Extension;
+import hudson.model.Descriptor;
+import hudson.plugins.view.dashboard.DashboardPortlet;
+import hudson.util.ListBoxModel;
+import hudson.util.Secret;
 
 /**
  * Shows SonarQube issues in a portlet.
@@ -36,17 +37,14 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
     private final int deltaDaysForNewIssues;
 
     private final String divId;
-    
-    private final String sonarApiUser;
-    private final String sonarApiPw;
+
+    private Secret secretSonarApiUserOrToken;
+    private Secret secretSonarApiPw;
     
     private final boolean showAlerts;
     private final String metricsCheckedForAlerts;
     private final String alwaysShowMetrics;
     
-    
-    
-
     @DataBoundConstructor
     public SonarIssuesPortlet(String name, String sonarBaseUrl,
             String sonarProjectsList, int sonarPriorityThreshold, int sonarAssigneeStatus, boolean sonarShowAssigneeBar,
@@ -54,10 +52,11 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
             boolean showAlerts, String metricsCheckedForAlerts, String alwaysShowMetrics,
             // advanced
             int maxEntries, int sonarNewIssuesPriorityThreshold,
-            int deltaDaysForNewIssues, int violationDescriptionMaximumLength, String sonarApiUser, 
-            String sonarApiPw, String labelAssigneesRanking, int maxAssigneesInRanking) {
+            int deltaDaysForNewIssues, int violationDescriptionMaximumLength, 
+            Secret secretSonarApiUserOrToken, Secret secretSonarApiPw,
+            String labelAssigneesRanking, int maxAssigneesInRanking) {
         super(name);
-        
+
         this.sonarBaseUrl = Utils.normalizeBaseUrl(sonarBaseUrl);   
 
         this.sonarProjectsList = sonarProjectsList;
@@ -75,8 +74,8 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
         this.deltaDaysForNewIssues = deltaDaysForNewIssues;
 
-        this.sonarApiUser = sonarApiUser;
-        this.sonarApiPw = sonarApiPw;
+        this.secretSonarApiUserOrToken = secretSonarApiUserOrToken;
+        this.secretSonarApiPw = secretSonarApiPw;
         
         this.showAlerts = showAlerts;
         this.metricsCheckedForAlerts = metricsCheckedForAlerts;
@@ -130,14 +129,12 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 		return labelAssigneesRanking;
 	}
 
-
-	public String getSonarApiUser() {
-		return sonarApiUser;
+	public Secret getSecretSonarApiUserOrToken() {
+		return secretSonarApiUserOrToken;
 	}
 
-
-	public String getSonarApiPw() {
-		return sonarApiPw;
+	public Secret getSecretSonarApiPw() {
+		return secretSonarApiPw;
 	}
 
 	public boolean getShowAlerts() {
@@ -202,11 +199,9 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
         return SonarAssigneeStatus.getPriorityValueByNameJson();
     }
     
-    
-
 	@JavaScriptMethod
     public HttpResponse ajaxViaJenkins(String urlStr) {
-		return new ServerSideHttpCall(urlStr, sonarApiUser, sonarApiPw);
+		return new ServerSideHttpCall(urlStr, Secret.toString(secretSonarApiUserOrToken), Secret.toString(secretSonarApiPw));
     }
 
     @Extension
