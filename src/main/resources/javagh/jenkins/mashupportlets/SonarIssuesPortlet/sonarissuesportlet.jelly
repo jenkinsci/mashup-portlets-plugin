@@ -1,3 +1,4 @@
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" 
         xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
       xmlns:dp="/hudson/plugins/view/dashboard">
@@ -5,6 +6,27 @@
 <style>
 td.sTableTop { vertical-align: top; }
 .sMessage { white-space: normal; }
+
+.icon-severity {
+   background-repeat: no-repeat;
+   padding-left: 11px;
+}
+
+.icon-severity-BLOCKER {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23d4333f' d='M6 12c-3.311 0-6-2.689-6-6s2.689-6 6-6 6 2.689 6 6-2.689 6-6 6zM5 7h2V2H5v5zm0 3h2V8H5v2z'/%3E%3C/svg%3E")
+}
+.icon-severity-CRITICAL {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23d4333f' d='M6 0c3.311 0 6 2.689 6 6s-2.689 6-6 6-6-2.689-6-6 2.689-6 6-6zm1 10V5.414l1.893 1.893c.13.124.282.216.457.261a1.006 1.006 0 0 0 1.176-.591 1.01 1.01 0 0 0 .01-.729 1.052 1.052 0 0 0-.229-.355C9.095 4.681 7.913 3.437 6.669 2.257a1.073 1.073 0 0 0-.169-.123 1.05 1.05 0 0 0-.448-.133h-.104a1.053 1.053 0 0 0-.493.16 1.212 1.212 0 0 0-.162.132C4.08 3.505 2.836 4.687 1.656 5.932a.994.994 0 0 0-.051 1.275c.208.271.548.42.888.389.198-.019.378-.098.535-.218.041-.035.04-.034.079-.071L5 5.414V10h2z'/%3E%3C/svg%3E")
+}
+.icon-severity-MAJOR {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' clip-rule='evenodd' stroke-linejoin='round' stroke-miterlimit='1.414'%3E%3Cpath fill='%23d4333f' d='M6 0c3.311 0 6 2.689 6 6s-2.689 6-6 6-6-2.689-6-6 2.689-6 6-6zm.08 2.903c.071.008.14.019.208.039.138.042.26.114.37.205 1.244 1.146 2.426 2.357 3.639 3.536.1.103.181.218.234.352a1.01 1.01 0 0 1 .001.728 1.002 1.002 0 0 1-1.169.609 1.042 1.042 0 0 1-.46-.255L6 5.295 3.097 8.117c-.039.036-.039.036-.08.07a1.002 1.002 0 0 1-1.604-.947c.032-.196.122-.37.253-.519C2.847 5.51 4.09 4.362 5.303 3.183c.052-.048.106-.093.167-.131a1.041 1.041 0 0 1 .61-.149z'/%3E%3C/svg%3E")
+}
+.icon-severity-MINOR {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%2387bb43' d='M6 0c3.311 0 6 2.689 6 6s-2.689 6-6 6-6-2.689-6-6 2.689-6 6-6zm1 6.586V2H5v4.586L3.107 4.693a1.178 1.178 0 0 0-.165-.134 1.041 1.041 0 0 0-.662-.152 1 1 0 0 0-.587 1.7c1.212 1.212 2.394 2.456 3.638 3.636.094.08.195.146.311.191a1.008 1.008 0 0 0 1.065-.227c1.213-1.212 2.457-2.394 3.637-3.639a.994.994 0 0 0 .051-1.275 1.012 1.012 0 0 0-.888-.389 1.041 1.041 0 0 0-.535.218c-.04.034-.04.034-.079.071L7 6.586z'/%3E%3C/svg%3E")
+}
+.icon-severity-INFO {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%234b9fd5' d='M6 0c3.311 0 6 2.689 6 6s-2.689 6-6 6-6-2.689-6-6 2.689-6 6-6zm1 5H5v5h2V5zm0-3H5v2h2V2z'/%3E%3C/svg%3E")
+}
 </style>
 
 <div id="${it.divId}_alerts" align="left"></div>
@@ -27,10 +49,8 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
       var userNameLookupTable = {};
       var UNASSIGNED = "unassigned";
       
-      var isSonar4 = false;
-    
       function getPrioHtmlImg(prio) {
-          var imgHtml = '<img src="'+sonarBase+'/images/priority/'+prioValueByName[prio]+'.png" border="0" alt="'+prio+'"/>';
+          var imgHtml = '<i class="icon-severity icon-severity-'+prio+'">&nbsp;</i>';
           return imgHtml;        
       }
 
@@ -70,8 +90,8 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
          message = message.replace(/([:./])/g, "<wbr/>$$1");      
          component = component.replace(/([:./])/g, "<wbr/>$$1");  
          
-         var issueLink = isSonar4 ? sonarBase + '/issue/show/' + issue.key : sonarBase + '/issues/search#issues=' + issue.key;  
-                          
+         var issueLink = sonarBase + '/issues?issues=' + issue.key + '&open='+issue.key;  
+
          var assignedColumnHtml = '';
          if(!showOnlyUnassigned()) {
              assignedColumnHtml = '<td class="sTableTop">' + getUserNameWithLinkForLogin(issue.assignee) + '</td>';
@@ -238,11 +258,6 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
                 }        
                 var responseObject = resp.responseObject();
                 
-                if(!responseObject.languages) {
-                    // if languages is not a property although explicitly requested via additionalFields => sonar 4
-                    isSonar4 = true;
-                }
-
                 populateUserNameLookupTable(responseObject.users);
                 
                 // console.log('issues in response: ', responseObject.issues);
