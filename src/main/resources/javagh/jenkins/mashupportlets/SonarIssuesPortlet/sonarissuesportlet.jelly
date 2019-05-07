@@ -41,7 +41,7 @@ td.sTableTop { vertical-align: top; }
 new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, 
     sonarPriorityThreshold, maxEntries, deltaDaysForNewIssues, sonarNewIssuesPriorities, 
     prioValueByName, sonarAssigneeStatus, assigneeStatusValueByNameJson, sonarShowAssigneeBar, 
-    labelAssigneesRanking, maxAssigneesInRanking, showAlerts, metricsCheckedForAlerts, alwaysShowMetrics) 
+    labelAssigneesRanking, maxAssigneesInRanking) 
 {
 
       var divSelect = "#" + divId;
@@ -281,75 +281,6 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 
       Q(document).ready(loadIssues);
 
-      // metrics & alerts
-      var divAlertsSelect = "#" + divId + "_alerts";
-      var metricsAndAlertsToShow = [];
-
-      function showAlertsAndMetrics() {
-          
-          if(metricsAndAlertsToShow.length == 0) {
-          	 Q(divAlertsSelect).html('');
-          	 return;
-          }            
-          
-          var showProjectInTbl = sonarProjects.length > 1;
-          var tableHtml = '<table class="pane bigtable" style="width:auto"><tr>' + (showProjectInTbl?'<th align="left">Project</th>':'') + '<th align="left">Metric</th><th align="left">Value</th><th align="left">Alert</th></tr>'
-          Q.each(metricsAndAlertsToShow, function(i, metric) {
-              var alertImgName = metric.alert ? metric.alert.toLowerCase() : 'ok';
-              var alertText = metric.alertText ? metric.alertText : '';
-              tableHtml += '<tr>' 
-              + (showProjectInTbl?'<td align="left">'+metric.project+'</td>':'') 
-              + '<td align="left">'+metric.name+'</td><td align="left">'+metric.val+'</td><td><img src="'+sonarBase+'/images/levels/'+alertImgName+'.png" border="0" alt="'+alertImgName+'"/> '+alertText+'</td></tr>';
-          });          
-          tableHtml += '</table><br/>';
-          Q(divAlertsSelect).html(tableHtml);
-      
-      }
-
-      function loadMetricsForProject(index, sonarProject) {
-
-          var metricsSring = metricsCheckedForAlerts.join(",");
-          var projectIssuesUrl = sonarBase + "/api/resources?format=json&verbose=true&includealerts=true&resource=" + sonarProject + "&metrics=" + metricsSring + "";
-          
-          ajaxViaJenkins(projectIssuesUrl,  function(resp) {
-                var text = resp.responseText;
-                
-                if(text.substring(0,5) == 'ERROR') {
-                     Q(divAlertsSelect).html(text);
-                     return;
-                }        
-                var responseObject = resp.responseObject();
-                // console.log(responseObject);
-                
-                Q.each(responseObject, function(i, projectMetrics) {
-                    if(projectMetrics.msr) Q.each(projectMetrics.msr, function(i, projectMetric) {
-                        if(projectMetric.alert_text || Q.inArray(projectMetric.key, alwaysShowMetrics)!=-1) {
-                           metricsAndAlertsToShow.push({
-                              'project': projectMetrics.name,
-                              'name': projectMetric.name,
-                              'val': projectMetric.frmt_val,
-                              'alert': projectMetric.alert,
-                              'alertText': projectMetric.alert_text
-                           });
-                        }
-                    });                
-                });
-          
-                if(index == sonarProjects.length-1) {
-	              showAlertsAndMetrics();
-                }  
-          });       
-      }
-
-      function loadMetrics() {
-          Q.each(sonarProjects, loadMetricsForProject);
-      }
-
-      if(showAlerts) {
-        Q(divAlertsSelect).append('Loading alerts... <img src="'+rootUrl+'/plugin/mashup-portlets-plugin/ajax-loader-bar.gif" />');      
-        Q(document).ready(loadMetrics);
-      }
-
 }('${it.divId}', 
     '${rootURL}', 
     mashupPlugin_${it.id}.ajaxViaJenkins,
@@ -365,10 +296,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
     ${it.assigneeStatusValueByNameJson},
     ${it.isSonarShowAssigneeBar()},
     '${it.labelAssigneesRanking}',
-    ${it.maxAssigneesInRanking},
-    ${it.showAlerts},
-    ${it.metricsCheckedForAlertsJson},
-    ${it.alwaysShowMetricsJson}    
+    ${it.maxAssigneesInRanking}   
 );
 
 ]]></script>

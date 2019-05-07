@@ -55,21 +55,6 @@
 	  </f:advanced>
     </f:optionalBlock>
   </f:section>
- 
-  <f:section title="${%Alerts}">
-    <f:optionalBlock name="showAlerts" title="${%ShowAlerts}" field="showAlerts" checked="${it.showAlerts}" inline="true">
-      <f:advanced>
-		  <f:entry title="${%MetricsCheckedForAlerts}" field="metricsCheckedForAlerts">
-		    <f:textbox />
-		  </f:entry>
-		  <f:entry title="${%AlwaysShowMetrics}" field="alwaysShowMetrics">
-		    <f:textbox />
-		  </f:entry>
-	  </f:advanced>
-    </f:optionalBlock>
-  </f:section>
-
-  
 
 
 </j:jelly>

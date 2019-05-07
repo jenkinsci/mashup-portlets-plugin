@@ -41,15 +41,9 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
     private Secret secretSonarApiUserOrToken;
     private Secret secretSonarApiPw;
     
-    private final boolean showAlerts;
-    private final String metricsCheckedForAlerts;
-    private final String alwaysShowMetrics;
-    
     @DataBoundConstructor
     public SonarIssuesPortlet(String name, String sonarBaseUrl,
             String sonarProjectsList, int sonarPriorityThreshold, int sonarAssigneeStatus, boolean sonarShowAssigneeBar,
-            // alerts
-            boolean showAlerts, String metricsCheckedForAlerts, String alwaysShowMetrics,
             // advanced
             int maxEntries, int sonarNewIssuesPriorityThreshold,
             int deltaDaysForNewIssues, int violationDescriptionMaximumLength, 
@@ -76,10 +70,6 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
         this.secretSonarApiUserOrToken = secretSonarApiUserOrToken;
         this.secretSonarApiPw = secretSonarApiPw;
-        
-        this.showAlerts = showAlerts;
-        this.metricsCheckedForAlerts = metricsCheckedForAlerts;
-        this.alwaysShowMetrics = alwaysShowMetrics;
         
         this.divId = "sonarDiv_" + getId();
     }
@@ -136,38 +126,6 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
 	public Secret getSecretSonarApiPw() {
 		return secretSonarApiPw;
 	}
-
-	public boolean getShowAlerts() {
-		return showAlerts;
-	}
-
-	public String getMetricsCheckedForAlerts() {
-		return metricsCheckedForAlerts;
-	}
-
-	public String getMetricsCheckedForAlertsJson() {
-		String metricsCheckedForAlerts = StringUtils
-				.isBlank(this.metricsCheckedForAlerts) ? 
-						"complexity,class_complexity,file_complexity,function_complexity,file_cycles,file_edges_weight,package_tangles,file_tangles,file_tangle_index,"
-						+ "package_cycles,package_feedback_edges,package_tangle_index,package_edges_weight,file_feedback_edges,comment_lines,comment_lines_density,"
-						+ "public_documented_api_density,public_undocumented_api,duplicated_blocks,duplicated_files,duplicated_lines,duplicated_lines_density,new_violations,"
-						+ "new_blocker_violations,new_critical_violations,new_major_violations,blocker_violations,critical_violations,major_violations,violations,"
-						+ "false_positive_issues,open_issues,confirmed_issues,reopened_issues,weighted_violations,violations_density,sqale_index,branch_coverage,"
-						+ "new_branch_coverage,coverage,new_coverage,new_line_coverage,skipped_tests,uncovered_conditions,new_uncovered_conditions,uncovered_lines,"
-						+ "new_uncovered_lines,tests,test_execution_time,test_errors,test_failures,test_success_density"
-				: this.metricsCheckedForAlerts;
-		String metricsCheckedForAlertsJson = Utils
-				.configListToJsonList(metricsCheckedForAlerts);
-		return metricsCheckedForAlertsJson;
-	}
-
-	public String getAlwaysShowMetrics() {
-		return alwaysShowMetrics;
-	}
-	public String getAlwaysShowMetricsJson() {
-        String alwaysShowMetricsJson = Utils.configListToJsonList(alwaysShowMetrics);
-        return alwaysShowMetricsJson;
-    }
 
 	public String getSonarProjectsJson() {
         String projectsJson = Utils.configListToJsonList(sonarProjectsList);
