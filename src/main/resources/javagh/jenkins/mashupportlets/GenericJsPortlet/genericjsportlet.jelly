@@ -6,7 +6,7 @@
 <div id="${it.containerDivId}" align="left"><img src="${rootURL}/plugin/mashup-portlets-plugin/ajax-loader-bar.gif"/></div>
 <st:include page="console-ie-fallback-js.jelly"/>
 
-<st:bind var="mashupPlugin_${it.id}" value="${it}"/>
+<st:bind var="mashupPlugin_${it.containerDivId}" value="${it}"/>
 
 <script type="text/javascript">
 
@@ -19,13 +19,11 @@ new function(divId, rootUrl, ajaxViaJenkinsWithoutAuth, ajaxViaJenkinsWithAuth) 
         }
     }
 
-/// GENERIC JS CONTENT STARTS HERE
+/// GENERIC JS CONTENT STARTS HERE (id: ${it.id})
 
 	${it.javascript}
 	
-/// GENERIC JS CONTENT ENDS HERE	
-}("${it.containerDivId}", "${rootURL}", mashupPlugin_${it.id}.ajaxViaJenkinsWithoutAuth, mashupPlugin_${it.id}.ajaxViaJenkinsWithAuth);
-
+/// GENERIC JS CONTENT ENDS HERE (id: ${it.id})	
+}("${it.containerDivId}", "${rootURL}", mashupPlugin_${it.containerDivId}.ajaxViaJenkinsWithoutAuth, mashupPlugin_${it.containerDivId}.ajaxViaJenkinsWithAuth);
 </script>
-
 </j:jelly>
