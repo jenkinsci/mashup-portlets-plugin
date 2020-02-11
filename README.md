@@ -84,23 +84,9 @@ Shows the test results for a configured job.
 
 ## Changelog
 
-#### Version 1.1.2 (Feb 11 2020)
+See [Releases](https://github.com/jenkinsci/mashup-portlets-plugin/releases) for recent changelog.
 
--   Fix for Generic JS Version
-    ([JENKINS-61039](https://issues.jenkins-ci.org/browse/JENKINS-61039))
-    to work with latest Dashboard Plugin
-    
-#### Version 1.1.0 (May 9 2019)
-
--   Fix for Generic JS Version
-    ([JENKINS-57309](https://issues.jenkins-ci.org/browse/JENKINS-57309))
-    to work with latest security model of Jenkins
--   Fixed SonarQube Portlet to work correctly with latest SonarQube LTS
-    version 6.7.x
-    ([JENKINS-57354](https://issues.jenkins-ci.org/browse/JENKINS-57354), [JENKINS-57308](https://issues.jenkins-ci.org/browse/JENKINS-57308)),
-    also fixed a security
-    issue ![(warning)](https://wiki.jenkins.io/s/en_GB/8100/5084f018d64a97dc638ca9a178856f851ea353ff/_/images/icons/emoticons/warning.svg) Upgrade
-    to this version is recommended! (token has to be re-entered)
+### Previous versions
 
 #### Version 1.0.9 (April 5 2018)
 
