@@ -21,7 +21,7 @@
 		SonarQube Portlets (show SonarQube statistics directly in Jenkins) 
 		and Test Results Portlet (shows the test results for a given job).
 	</description>
-	<url>https://wiki.jenkins-ci.org/display/JENKINS/Mashup+Portlets</url>
+	<url>https://github.com/jenkinsci/mashup-portlets-plugin</url>
 
 	<properties>
 		<jenkins.version>2.164</jenkins.version>
