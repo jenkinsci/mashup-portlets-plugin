@@ -10,7 +10,7 @@
     
 	<groupId>javagh.jenkins</groupId>
 	<artifactId>mashup-portlets-plugin</artifactId>
-	<version>1.1.2-SNAPSHOT</version>
+	<version>1.1.2</version>
 	<packaging>hpi</packaging>
 	
 	<name>Mashup Portlets</name>
@@ -31,7 +31,7 @@
 		<connection>scm:git:https://github.com/jenkinsci/mashup-portlets-plugin.git</connection>
 		<developerConnection>scm:git:https://github.com/jenkinsci/mashup-portlets-plugin.git</developerConnection>
 		<url>https://github.com/jenkinsci/mashup-portlets-plugin</url>
-	  <tag>HEAD</tag>
+	  <tag>mashup-portlets-plugin-1.1.2</tag>
 	</scm>
 
 	<distributionManagement>
