@@ -35,7 +35,7 @@ td.sTableTop { vertical-align: top; }
 
 <st:include page="console-ie-fallback-js.jelly"/>
 
-<st:bind var="mashupPlugin_${it.id}" value="${it}"/>
+<st:bind var="mashupPlugin_${it.divId}" value="${it}"/>
 <script type="text/javascript"><![CDATA[
 
 new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPriorities, 
@@ -283,7 +283,7 @@ new function(divId, rootUrl, ajaxViaJenkins, sonarBase, sonarProjects, sonarPrio
 
 }('${it.divId}', 
     '${rootURL}', 
-    mashupPlugin_${it.id}.ajaxViaJenkins,
+    mashupPlugin_${it.divId}.ajaxViaJenkins,
     '${it.sonarBaseUrl}',
     ${it.sonarProjectsJson},
     ${it.sonarPrioritiesJson},

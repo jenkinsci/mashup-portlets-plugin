@@ -1,5 +1,7 @@
 package javagh.jenkins.mashupportlets;
 
+import java.util.Random;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -21,6 +23,7 @@ import hudson.util.Secret;
 public class SonarIssuesPortlet extends AbstractMashupPortlet {
 
     private static final int DEFAULT_PRIO_NO = -1;
+	private static Random generator = new Random(); 
 
     private final String sonarBaseUrl;
     private final String sonarProjectsList;
@@ -71,7 +74,12 @@ public class SonarIssuesPortlet extends AbstractMashupPortlet {
         this.secretSonarApiUserOrToken = secretSonarApiUserOrToken;
         this.secretSonarApiPw = secretSonarApiPw;
         
-        this.divId = "sonarDiv_" + getId();
+        // needed since hudson.plugins.view.dashboard.DashboardPortlet changed its id handling with version 2.12
+        // at configuration change time (on view save and when this code is executed) getId() does not work
+        // properly, it only returns "portlet-" without a number
+        // in genericjsportlet.jelly getId() cannot be used anymore as a frontend ID because it contains a dash now (using containerDivId in all places instead) 
+        int uniqueId = generator.nextInt(32000);
+        this.divId = "sonar" + uniqueId;
     }
     
     
